@@ -13,15 +13,15 @@
 <body>
 <header class="topbar">
   <div class="brandmark">XXL</div>
-  <div class="brandcopy"><strong>Mockup Studio</strong><span>Template Engine v2</span></div>
+  <div class="brandcopy"><strong>Mockup Studio</strong><span>Path Engine v4</span></div>
   <div class="live"><i></i> Live</div>
 </header>
 
 <main class="workspace">
   <aside class="controls">
-    <p class="eyebrow">Schaalbare template-engine</p>
+    <p class="eyebrow">Padgestuurde bedrukking</p>
     <h1>Keycord mockup</h1>
-    <p class="intro">Templates worden automatisch ingelezen uit <code>templates.json</code>. Nieuwe breedtes en varianten hebben alleen nieuwe bestanden en één configuratieregel nodig.</p>
+    <p class="intro">Logo's worden gelijkmatig over opgeslagen middenlijnen verdeeld en draaien automatisch met ieder lintdeel mee.</p>
 
     <label class="title">1. Template</label>
     <select id="template"></select>
@@ -43,14 +43,41 @@
       <input id="hex" value="#E30613" maxlength="7">
     </div>
 
-    <label class="range-label"><span>Logoformaat</span><b id="sizeValue">70%</b></label>
-    <input id="size" type="range" min="35" max="110" value="70">
+    <label class="range-label"><span>Logoformaat</span><b id="sizeValue">52%</b></label>
+    <input id="size" type="range" min="25" max="95" value="52">
 
-    <label class="range-label"><span>Logoafstand</span><b id="spacingValue">Normaal</b></label>
-    <input id="spacing" type="range" min="1" max="3" value="2">
+    <label class="range-label"><span>Aantal logo's totaal</span><b id="countValue">12</b></label>
+    <input id="logoCount" type="range" min="3" max="20" value="12">
+
+    <label class="range-label"><span>Startpositie verschuiven</span><b id="offsetValue">0%</b></label>
+    <input id="offset" type="range" min="-45" max="45" value="0">
 
     <label class="range-label"><span>Extra rotatie</span><b id="rotationValue">0°</b></label>
     <input id="rotation" type="range" min="-15" max="15" value="0">
+
+    <label class="checkrow">
+      <input id="autoCount" type="checkbox" checked>
+      <span><b>Automatisch adviseren</b><small>Past het aantal aan op basis van logoformaat en padlengte.</small></span>
+    </label>
+
+    <div class="editorbox">
+      <div>
+        <b>Templatepad</b>
+        <small>Alleen nodig bij het toevoegen of corrigeren van een mockup.</small>
+      </div>
+      <button id="editPath" type="button">Pad bewerken</button>
+    </div>
+
+    <div id="editorControls" class="editor-controls hidden">
+      <label class="title">Lintdeel</label>
+      <select id="pathSelect"></select>
+      <div class="editor-actions">
+        <button id="undoPoint" type="button">Laatste punt weg</button>
+        <button id="clearPath" type="button">Pad leegmaken</button>
+      </div>
+      <button id="savePath" class="save-path" type="button">Pad gereed</button>
+      <p>Klik op de preview om punten te zetten. Sleep een bestaand punt om het te verplaatsen.</p>
+    </div>
 
     <div class="actions">
       <button id="reset" class="secondary">Reset</button>
@@ -61,14 +88,16 @@
   <section class="preview">
     <div class="previewhead">
       <div><small>LIVE RESULTAAT</small><h2 id="previewTitle">Template laden…</h2></div>
-      <span>ECHTE PSD-LAGEN</span>
+      <span id="modeBadge">ECHTE PSD-LAGEN</span>
     </div>
-    <div class="stage">
+    <div id="stage" class="stage">
       <canvas id="canvas"></canvas>
-      <div id="empty"><b>Upload een logo</b><small>Template, kleur en haak werken al direct.</small></div>
+      <div id="empty"><b>Upload een logo</b><small>Kleur, haak en pad zijn al zichtbaar.</small></div>
       <div id="loading">Mockup laden…</div>
+      <div id="editorHint" class="editor-hint hidden">Klik over het midden van het lint · sleep punten om te corrigeren</div>
     </div>
-    <div class="note"><b>Voor uitbreiding:</b> upload later bestanden zoals <code>20mm-buckle-base.png</code> en voeg de template toe aan <code>templates.json</code>. De websitecode blijft hetzelfde.</div>
+    <div class="note"><b>Pad-editor:</b> de aangepaste punten blijven tijdens deze sessie actief. De knop <b>Padgegevens kopiëren</b> maakt JSON dat later in <code>templates.json</code> kan worden gezet.</div>
+    <button id="copyPath" class="copy-path hidden" type="button">Padgegevens kopiëren</button>
   </section>
 </main>
 <script src="app.js"></script>
