@@ -28,31 +28,64 @@ async function loadTemplate(id){
 function coloredMask(){
  const c=offscreen(),g=c.getContext('2d');
  g.drawImage(assets.colorMask,0,0);
- g.globalCompositeOperation='source-in';g.fillStyle=ui.color.value;g.fillRect(0,0,c.width,c.height);
+ g.globalCompositeOperation='source-in';
+ g.fillStyle=ui.color.value;
+ g.fillRect(0,0,c.width,c.height);
  return c;
+}
+function inAvoidZone(x,y){
+ return (currentTemplate.avoidZones||[]).some(z=>Math.hypot(x-z.x,y-z.y)<z.radius);
 }
 function logoLayer(){
  const c=offscreen(),g=c.getContext('2d');
  if(!logo)return c;
- const size=Number(ui.size.value),rot=Number(ui.rotation.value);
- const step=ui.spacing.value==='1'?3:ui.spacing.value==='2'?2:1;
- currentTemplate.logoPlacements.forEach(([x,y,deg],i)=>{
-  if(i%step!==0)return;
-  g.save();g.translate(x,y);g.rotate((deg+rot)*Math.PI/180);
-  drawContained(g,logo,size*2.5,size*.72);g.restore();
+
+ const size=Number(ui.size.value);
+ const extraRotation=Number(ui.rotation.value);
+ const spacingMode=Number(ui.spacing.value);
+ const stride=spacingMode===1?2:1;
+ const maxW=size*2.10;
+ const maxH=size*0.56;
+
+ (currentTemplate.logoTracks||[]).forEach(track=>{
+   track.placements.forEach(([x,y,deg],index)=>{
+     if(index%stride!==0)return;
+     if(inAvoidZone(x,y))return;
+     g.save();
+     g.translate(x,y);
+     g.rotate((deg+extraRotation)*Math.PI/180);
+     drawContained(g,logo,maxW,maxH);
+     g.restore();
+   });
  });
- g.globalCompositeOperation='destination-in';g.drawImage(assets.designMask,0,0);
+
+ g.globalCompositeOperation='destination-in';
+ g.drawImage(assets.designMask,0,0);
  return c;
 }
 function render(){
  if(!currentTemplate||!assets.base)return;
  ctx.clearRect(0,0,canvas.width,canvas.height);
- ctx.fillStyle='#f7f7f7';ctx.fillRect(0,0,canvas.width,canvas.height);
+ ctx.fillStyle='#f7f7f7';
+ ctx.fillRect(0,0,canvas.width,canvas.height);
+
  ctx.drawImage(assets.shadow,0,0);
  ctx.drawImage(coloredMask(),0,0);
- ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.70;ctx.drawImage(assets.base,0,0);ctx.restore();
+
+ ctx.save();
+ ctx.globalCompositeOperation='multiply';
+ ctx.globalAlpha=.70;
+ ctx.drawImage(assets.base,0,0);
+ ctx.restore();
+
  if(logo)ctx.drawImage(logoLayer(),0,0);
- ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.72;ctx.drawImage(assets.overlay,0,0);ctx.restore();
+
+ ctx.save();
+ ctx.globalCompositeOperation='multiply';
+ ctx.globalAlpha=.72;
+ ctx.drawImage(assets.overlay,0,0);
+ ctx.restore();
+
  ctx.drawImage(assets['hook:'+ui.hook.value],0,0);
 }
 async function init(){
@@ -61,13 +94,23 @@ async function init(){
  config=await response.json();
  config.templates.forEach(t=>{const o=document.createElement('option');o.value=t.id;o.textContent=t.label;ui.template.appendChild(o)});
  await loadTemplate(config.templates[0].id);
+
+ // Betere standaardinstellingen voor deze echte 20 mm mockup.
+ ui.size.value=54;
+ ui.spacing.value=2;
+ ui.rotation.value=0;
+ ui.sizeValue.textContent='54%';
+ ui.spacingValue.textContent='Normaal';
+ ui.rotationValue.textContent='0°';
+ render();
 }
 ui.template.addEventListener('change',()=>loadTemplate(ui.template.value).catch(showError));
 ui.logoInput.addEventListener('change',()=>{
  const file=ui.logoInput.files?.[0];if(!file)return;
  const url=URL.createObjectURL(file),im=new Image();
  im.onload=()=>{logo=im;ui.filename.textContent=file.name;ui.empty.style.display='none';URL.revokeObjectURL(url);render()};
- im.onerror=()=>{URL.revokeObjectURL(url);alert('Dit logo kon niet worden geopend.')};im.src=url;
+ im.onerror=()=>{URL.revokeObjectURL(url);alert('Dit logo kon niet worden geopend.')};
+ im.src=url;
 });
 ui.hook.addEventListener('change',render);
 ui.color.addEventListener('input',()=>{ui.hex.value=ui.color.value.toUpperCase();render()});
@@ -75,7 +118,17 @@ ui.hex.addEventListener('input',()=>{if(/^#[0-9A-Fa-f]{6}$/.test(ui.hex.value)){
 ui.size.addEventListener('input',()=>{ui.sizeValue.textContent=ui.size.value+'%';render()});
 ui.spacing.addEventListener('input',()=>{ui.spacingValue.textContent=['','Ruim','Normaal','Compact'][ui.spacing.value];render()});
 ui.rotation.addEventListener('input',()=>{ui.rotationValue.textContent=ui.rotation.value+'°';render()});
-$('reset').addEventListener('click',()=>{ui.color.value='#e30613';ui.hex.value='#E30613';ui.size.value=70;ui.spacing.value=2;ui.rotation.value=0;ui.sizeValue.textContent='70%';ui.spacingValue.textContent='Normaal';ui.rotationValue.textContent='0°';ui.hook.selectedIndex=0;render()});
-$('download').addEventListener('click',()=>{const a=document.createElement('a');a.download=`xxlgifts-${currentTemplate.id}-mockup.png`;a.href=canvas.toDataURL('image/png');a.click()});
+$('reset').addEventListener('click',()=>{
+ ui.color.value='#e30613';ui.hex.value='#E30613';
+ ui.size.value=54;ui.spacing.value=2;ui.rotation.value=0;
+ ui.sizeValue.textContent='54%';ui.spacingValue.textContent='Normaal';ui.rotationValue.textContent='0°';
+ ui.hook.selectedIndex=0;render();
+});
+$('download').addEventListener('click',()=>{
+ const a=document.createElement('a');
+ a.download=`xxlgifts-${currentTemplate.id}-mockup.png`;
+ a.href=canvas.toDataURL('image/png');
+ a.click();
+});
 function showError(err){console.error(err);ui.loading.style.display='flex';ui.loading.textContent='Fout: '+err.message}
 init().catch(showError);
