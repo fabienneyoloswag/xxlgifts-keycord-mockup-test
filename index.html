@@ -26,13 +26,51 @@
     <label class="title">1. Template</label>
     <select id="template"></select>
 
-    <label class="title">2. Logo uploaden</label>
-    <label class="upload">
-      <span class="plus">+</span>
-      <b id="filename">Kies SVG of PNG</b>
-      <small>Transparante achtergrond aanbevolen</small>
-      <input id="logoInput" type="file" accept=".svg,.png,.jpg,.jpeg,.webp,image/*">
-    </label>
+    <label class="title">2. Bedrukkingsopbouw</label>
+    <select id="designMode">
+      <option value="repeat">Eén logo herhalen</option>
+      <option value="separate">Voorste en teruglopende lint apart</option>
+      <option value="continuous">Volledig doorlopend ontwerp</option>
+    </select>
+
+    <div id="repeatUpload" class="mode-panel">
+      <label class="upload">
+        <span class="plus">+</span>
+        <b id="filename">Kies logo: SVG of PNG</b>
+        <small>Wordt automatisch langs beide lintdelen herhaald</small>
+        <input id="logoInput" type="file" accept=".svg,.png,.jpg,.jpeg,.webp,image/*">
+      </label>
+    </div>
+
+    <div id="separateUploads" class="mode-panel hidden">
+      <div class="dual-upload">
+        <label class="upload compact-upload">
+          <span class="plus">+</span>
+          <b id="frontFilename">Ontwerp voorste lint</b>
+          <small>Logo, tekst of lijntekening</small>
+          <input id="frontDesignInput" type="file" accept=".svg,.png,.jpg,.jpeg,.webp,image/*">
+        </label>
+        <label class="upload compact-upload">
+          <span class="plus">+</span>
+          <b id="backFilename">Ontwerp teruglopend lint</b>
+          <small>Mag volledig anders zijn</small>
+          <input id="backDesignInput" type="file" accept=".svg,.png,.jpg,.jpeg,.webp,image/*">
+        </label>
+      </div>
+    </div>
+
+    <div id="continuousUpload" class="mode-panel hidden">
+      <label class="upload">
+        <span class="plus">+</span>
+        <b id="continuousFilename">Kies volledige lijntekening</b>
+        <small>Langwerpige SVG of PNG aanbevolen</small>
+        <input id="continuousDesignInput" type="file" accept=".svg,.png,.jpg,.jpeg,.webp,image/*">
+      </label>
+      <label class="checkrow continuous-check">
+        <input id="repeatContinuous" type="checkbox">
+        <span><b>Ontwerp herhalen</b><small>Uit = één ontwerp over de volledige zichtbare lengte.</small></span>
+      </label>
+    </div>
 
     <label class="title">3. Haak kiezen</label>
     <select id="hook"></select>
@@ -43,20 +81,55 @@
       <input id="hex" value="#E30613" maxlength="7">
     </div>
 
-    <label class="range-label"><span>Logoformaat</span><b id="sizeValue">52%</b></label>
-    <input id="size" type="range" min="25" max="95" value="52">
+    <label class="range-label"><span>Logoformaat algemeen</span><b id="sizeValue">52%</b></label>
+    <input id="size" class="full-range" type="range" min="25" max="95" value="52">
 
-    <label class="range-label"><span>Logo's voorste lint</span><b id="frontCountValue">7</b></label>
-    <input id="frontCount" type="range" min="1" max="14" value="7">
+    <div class="side-grid">
+      <section class="side-card">
+        <div class="side-title">
+          <span>Voorste lint</span>
+          <small>Links / bovenliggend</small>
+        </div>
 
-    <label class="range-label"><span>Logo's teruglopend lint</span><b id="backCountValue">5</b></label>
-    <input id="backCount" type="range" min="1" max="12" value="5">
+        <label class="range-label"><span>Aantal logo's</span><b id="frontCountValue">7</b></label>
+        <input id="frontCount" class="full-range" type="range" min="1" max="14" value="7">
 
-    <label class="range-label"><span>Startpositie verschuiven</span><b id="offsetValue">0%</b></label>
-    <input id="offset" type="range" min="-45" max="45" value="0">
+        <label class="range-label"><span>Positie</span><b id="frontOffsetValue">0%</b></label>
+        <input id="frontOffset" class="full-range" type="range" min="-45" max="45" value="0">
 
-    <label class="range-label"><span>Extra rotatie</span><b id="rotationValue">0°</b></label>
-    <input id="rotation" type="range" min="-15" max="15" value="0">
+        <label class="range-label"><span>Rotatie</span><b id="frontRotationValue">0°</b></label>
+        <input id="frontRotation" class="full-range" type="range" min="-25" max="25" value="0">
+      </section>
+
+      <section class="side-card">
+        <div class="side-title">
+          <span>Teruglopend lint</span>
+          <small>Rechts / achterliggend</small>
+        </div>
+
+        <label class="range-label"><span>Aantal logo's</span><b id="backCountValue">5</b></label>
+        <input id="backCount" class="full-range" type="range" min="1" max="14" value="5">
+
+        <label class="range-label"><span>Positie</span><b id="backOffsetValue">0%</b></label>
+        <input id="backOffset" class="full-range" type="range" min="-45" max="45" value="0">
+
+        <label class="range-label"><span>Rotatie</span><b id="backRotationValue">0°</b></label>
+        <input id="backRotation" class="full-range" type="range" min="-25" max="25" value="0">
+      </section>
+    </div>
+
+    <div id="continuousControls" class="continuous-controls hidden">
+      <label class="range-label"><span>Schaal doorlopend ontwerp</span><b id="continuousScaleValue">100%</b></label>
+      <input id="continuousScale" class="full-range" type="range" min="40" max="220" value="100">
+
+      <label class="range-label"><span>Ontwerp verschuiven</span><b id="continuousOffsetValue">0%</b></label>
+      <input id="continuousOffset" class="full-range" type="range" min="-100" max="100" value="0">
+
+      <label class="checkrow">
+        <input id="flipBackContinuous" type="checkbox" checked>
+        <span><b>Teruglopend lint omkeren</b><small>Zorgt dat de illustratie op de achterzijde natuurlijk doorloopt.</small></span>
+      </label>
+    </div>
 
     <div class="editorbox">
       <div><b>Templatepad</b><small>Alleen nodig om een lintlijn te corrigeren.</small></div>

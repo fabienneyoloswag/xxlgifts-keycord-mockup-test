@@ -1,17 +1,28 @@
 const $=id=>document.getElementById(id);
 const canvas=$('canvas'),ctx=canvas.getContext('2d');
 const ui={
- template:$('template'),logoInput:$('logoInput'),filename:$('filename'),hook:$('hook'),
+ template:$('template'),designMode:$('designMode'),
+ logoInput:$('logoInput'),filename:$('filename'),
+ frontDesignInput:$('frontDesignInput'),frontFilename:$('frontFilename'),
+ backDesignInput:$('backDesignInput'),backFilename:$('backFilename'),
+ continuousDesignInput:$('continuousDesignInput'),continuousFilename:$('continuousFilename'),
+ repeatUpload:$('repeatUpload'),separateUploads:$('separateUploads'),
+ continuousUpload:$('continuousUpload'),continuousControls:$('continuousControls'),
+ repeatContinuous:$('repeatContinuous'),flipBackContinuous:$('flipBackContinuous'),
+ continuousScale:$('continuousScale'),continuousScaleValue:$('continuousScaleValue'),
+ continuousOffset:$('continuousOffset'),continuousOffsetValue:$('continuousOffsetValue'),
+ hook:$('hook'),
  color:$('color'),hex:$('hex'),size:$('size'),frontCount:$('frontCount'),backCount:$('backCount'),
- offset:$('offset'),rotation:$('rotation'),sizeValue:$('sizeValue'),
- frontCountValue:$('frontCountValue'),backCountValue:$('backCountValue'),
- offsetValue:$('offsetValue'),rotationValue:$('rotationValue'),empty:$('empty'),
+ frontOffset:$('frontOffset'),backOffset:$('backOffset'),frontRotation:$('frontRotation'),backRotation:$('backRotation'),
+ sizeValue:$('sizeValue'),frontCountValue:$('frontCountValue'),backCountValue:$('backCountValue'),
+ frontOffsetValue:$('frontOffsetValue'),backOffsetValue:$('backOffsetValue'),
+ frontRotationValue:$('frontRotationValue'),backRotationValue:$('backRotationValue'),empty:$('empty'),
  loading:$('loading'),previewTitle:$('previewTitle'),stage:$('stage'),editPath:$('editPath'),
  editorControls:$('editorControls'),pathSelect:$('pathSelect'),undoPoint:$('undoPoint'),
  clearPath:$('clearPath'),savePath:$('savePath'),editorHint:$('editorHint'),
  modeBadge:$('modeBadge'),copyPath:$('copyPath'),saveTools:$('saveTools'),downloadTemplate:$('downloadTemplate')
 };
-let config=null,currentTemplate=null,assets={},logo=null;
+let config=null,currentTemplate=null,assets={},logo=null,frontDesign=null,backDesign=null,continuousDesign=null;
 let editing=false,dragging=null,sessionPaths=[];
 
 function loadImage(src){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Kon '+src+' niet laden'));im.src=src})}
@@ -20,6 +31,14 @@ function drawFull(g,img){
  g.drawImage(img,0,0,g.canvas.width,g.canvas.height);
 }
 function drawContained(g,img,maxW,maxH){const s=Math.min(maxW/img.width,maxH/img.height);g.drawImage(img,-img.width*s/2,-img.height*s/2,img.width*s,img.height*s)}
+function loadUploadedFile(input,labelElement,onLoaded){
+ const file=input.files?.[0];if(!file)return;
+ const url=URL.createObjectURL(file),im=new Image();
+ im.onload=()=>{onLoaded(im);labelElement.textContent=file.name;ui.empty.style.display='none';URL.revokeObjectURL(url);render()};
+ im.onerror=()=>{URL.revokeObjectURL(url);alert('Dit ontwerp kon niet worden geopend.')};
+ im.src=url;
+}
+
 function clonePaths(paths){return JSON.parse(JSON.stringify(paths||[]))}
 
 async function loadTemplate(id){
@@ -54,25 +73,61 @@ function pointAtDistance(points,distance){
   walked+=segment}
  const a=points.at(-2),b=points.at(-1);return{x:b[0],y:b[1],angle:Math.atan2(b[1]-a[1],b[0]-a[0])};
 }
-function logosForPath(path,count){
- const c=offscreen(),g=c.getContext('2d');if(!logo||path.points.length<2)return c;
+function selectedDesignForPath(path){
+ const mode=ui.designMode.value;
+ if(mode==='repeat')return logo;
+ if(mode==='separate')return path.id==='front'?frontDesign:backDesign;
+ return continuousDesign;
+}
+function repeatedDesignForPath(path,count,img){
+ const c=offscreen(),g=c.getContext('2d');if(!img||path.points.length<2)return c;
  const length=pathLength(path.points),margin=Math.min(length*.12,85),usable=Math.max(1,length-margin*2);
- const size=Number(ui.size.value),extra=Number(ui.rotation.value)*Math.PI/180;
- const offsetPct=Number(ui.offset.value)/100;
+ const size=Number(ui.size.value);
+ const isFront=path.id==='front';
+ const manualRotation=Number(isFront?ui.frontRotation.value:ui.backRotation.value);
+ const extra=manualRotation*Math.PI/180;
+ const offsetPct=Number(isFront?ui.frontOffset.value:ui.backOffset.value)/100;
  for(let i=0;i<count;i++){
   const base=count===1?.5:i/(count-1),shifted=Math.max(0,Math.min(1,base+offsetPct/Math.max(1,count)));
   const pos=pointAtDistance(path.points,margin+usable*shifted);if(!pos)continue;
   g.save();g.translate(pos.x,pos.y);g.rotate(pos.angle+(path.rotationOffset||0)*Math.PI/180+extra);
-  drawContained(g,logo,size*2.12,size*.58);g.restore();
+  drawContained(g,img,size*2.12,size*.58);g.restore();
  }
  g.globalCompositeOperation='destination-in';drawFull(g,assets[path.mask]);return c;
+}
+function continuousDesignForPath(path,img){
+ const c=offscreen(),g=c.getContext('2d');if(!img||path.points.length<2)return c;
+ const points=path.points,length=pathLength(points);
+ const scale=Number(ui.continuousScale.value)/100;
+ const shift=Number(ui.continuousOffset.value)/100;
+ const repeat=ui.repeatContinuous.checked;
+ const flipBack=ui.flipBackContinuous.checked&&path.id==='back';
+ const tileLength=repeat?Math.max(140,img.width/img.height*78*scale):length*scale;
+ const step=repeat?tileLength:Math.max(1,length);
+ const startDistance=repeat?(-tileLength+((shift+1)/2)*tileLength):(length-tileLength)/2+shift*length*.45;
+ for(let d=startDistance;d<length+tileLength;d+=step){
+  const center=Math.max(0,Math.min(length,d+tileLength/2));
+  const pos=pointAtDistance(points,center);if(!pos)continue;
+  g.save();g.translate(pos.x,pos.y);
+  g.rotate(pos.angle+(flipBack?Math.PI:0));
+  const targetH=78*scale,targetW=tileLength;
+  g.drawImage(img,-targetW/2,-targetH/2,targetW,targetH);
+  g.restore();
+  if(!repeat)break;
+ }
+ g.globalCompositeOperation='destination-in';drawFull(g,assets[path.mask]);return c;
+}
+function logosForPath(path,count){
+ const img=selectedDesignForPath(path);
+ if(ui.designMode.value==='continuous')return continuousDesignForPath(path,img);
+ return repeatedDesignForPath(path,count,img);
 }
 function drawRibbonSide(path,count){
  const mask=assets[path.mask];
  drawFull(ctx,maskFill(mask,ui.color.value));
  const texture=clippedTexture(mask,assets.base);
  ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.70;drawFull(ctx,texture);ctx.restore();
- if(logo)drawFull(ctx,logosForPath(path,count));
+ if(selectedDesignForPath(path))drawFull(ctx,logosForPath(path,count));
 }
 function drawEditor(){
  if(!editing)return;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
@@ -119,9 +174,30 @@ function downloadJson(filename,data){
 }
 async function init(){const response=await fetch('templates.json',{cache:'no-store'});if(!response.ok)throw new Error('templates.json kon niet laden');config=await response.json();config.templates.forEach(t=>{const o=document.createElement('option');o.value=t.id;o.textContent=t.label;ui.template.appendChild(o)});await loadTemplate(config.templates[0].id)}
 ui.template.addEventListener('change',()=>loadTemplate(ui.template.value).catch(showError));
-ui.logoInput.addEventListener('change',()=>{const file=ui.logoInput.files?.[0];if(!file)return;const url=URL.createObjectURL(file),im=new Image();im.onload=()=>{logo=im;ui.filename.textContent=file.name;ui.empty.style.display='none';URL.revokeObjectURL(url);render()};im.onerror=()=>{URL.revokeObjectURL(url);alert('Dit logo kon niet worden geopend.')};im.src=url});
+ui.logoInput.addEventListener('change',()=>loadUploadedFile(ui.logoInput,ui.filename,im=>logo=im));
+ui.frontDesignInput.addEventListener('change',()=>loadUploadedFile(ui.frontDesignInput,ui.frontFilename,im=>frontDesign=im));
+ui.backDesignInput.addEventListener('change',()=>loadUploadedFile(ui.backDesignInput,ui.backFilename,im=>backDesign=im));
+ui.continuousDesignInput.addEventListener('change',()=>loadUploadedFile(ui.continuousDesignInput,ui.continuousFilename,im=>continuousDesign=im));
+ui.designMode.addEventListener('change',()=>{
+ const mode=ui.designMode.value;
+ ui.repeatUpload.classList.toggle('hidden',mode!=='repeat');
+ ui.separateUploads.classList.toggle('hidden',mode!=='separate');
+ ui.continuousUpload.classList.toggle('hidden',mode!=='continuous');
+ ui.continuousControls.classList.toggle('hidden',mode!=='continuous');
+ render();
+});
+ui.repeatContinuous.addEventListener('change',render);
+ui.flipBackContinuous.addEventListener('change',render);
+ui.continuousScale.addEventListener('input',()=>{ui.continuousScaleValue.textContent=ui.continuousScale.value+'%';render()});
+ui.continuousOffset.addEventListener('input',()=>{ui.continuousOffsetValue.textContent=ui.continuousOffset.value+'%';render()});
 ui.hook.addEventListener('change',render);ui.color.addEventListener('input',()=>{ui.hex.value=ui.color.value.toUpperCase();render()});ui.hex.addEventListener('input',()=>{if(/^#[0-9A-Fa-f]{6}$/.test(ui.hex.value)){ui.color.value=ui.hex.value;render()}});
-ui.size.addEventListener('input',()=>{ui.sizeValue.textContent=ui.size.value+'%';render()});ui.frontCount.addEventListener('input',()=>{ui.frontCountValue.textContent=ui.frontCount.value;render()});ui.backCount.addEventListener('input',()=>{ui.backCountValue.textContent=ui.backCount.value;render()});ui.offset.addEventListener('input',()=>{ui.offsetValue.textContent=ui.offset.value+'%';render()});ui.rotation.addEventListener('input',()=>{ui.rotationValue.textContent=ui.rotation.value+'°';render()});
+ui.size.addEventListener('input',()=>{ui.sizeValue.textContent=ui.size.value+'%';render()});
+ui.frontCount.addEventListener('input',()=>{ui.frontCountValue.textContent=ui.frontCount.value;render()});
+ui.backCount.addEventListener('input',()=>{ui.backCountValue.textContent=ui.backCount.value;render()});
+ui.frontOffset.addEventListener('input',()=>{ui.frontOffsetValue.textContent=ui.frontOffset.value+'%';render()});
+ui.backOffset.addEventListener('input',()=>{ui.backOffsetValue.textContent=ui.backOffset.value+'%';render()});
+ui.frontRotation.addEventListener('input',()=>{ui.frontRotationValue.textContent=ui.frontRotation.value+'°';render()});
+ui.backRotation.addEventListener('input',()=>{ui.backRotationValue.textContent=ui.backRotation.value+'°';render()});
 ui.editPath.addEventListener('click',()=>setEditing(!editing));ui.pathSelect.addEventListener('change',render);ui.undoPoint.addEventListener('click',()=>{sessionPaths[Number(ui.pathSelect.value)].points.pop();render()});ui.clearPath.addEventListener('click',()=>{sessionPaths[Number(ui.pathSelect.value)].points=[];render()});ui.savePath.addEventListener('click',()=>setEditing(false));
 ui.downloadTemplate.addEventListener('click',()=>{
  downloadJson('templates.json',buildUpdatedConfig());
@@ -140,7 +216,23 @@ ui.copyPath.addEventListener('click',async()=>{
  }
 });
 canvas.addEventListener('mousedown',beginPointer);canvas.addEventListener('mousemove',movePointer);window.addEventListener('mouseup',endPointer);canvas.addEventListener('touchstart',beginPointer,{passive:false});canvas.addEventListener('touchmove',movePointer,{passive:false});window.addEventListener('touchend',endPointer);
-$('reset').addEventListener('click',()=>{ui.color.value='#e30613';ui.hex.value='#E30613';ui.size.value=52;ui.frontCount.value=7;ui.backCount.value=5;ui.offset.value=0;ui.rotation.value=0;ui.sizeValue.textContent='52%';ui.frontCountValue.textContent='7';ui.backCountValue.textContent='5';ui.offsetValue.textContent='0%';ui.rotationValue.textContent='0°';ui.hook.selectedIndex=0;sessionPaths=clonePaths(currentTemplate.paths);setEditing(false);render()});
+$('reset').addEventListener('click',()=>{
+ ui.color.value='#e30613';ui.hex.value='#E30613';ui.size.value=52;
+ ui.frontCount.value=7;ui.backCount.value=5;
+ ui.frontOffset.value=0;ui.backOffset.value=0;
+ ui.frontRotation.value=0;ui.backRotation.value=0;
+ ui.sizeValue.textContent='52%';
+ ui.frontCountValue.textContent='7';ui.backCountValue.textContent='5';
+ ui.frontOffsetValue.textContent='0%';ui.backOffsetValue.textContent='0%';
+ ui.frontRotationValue.textContent='0°';ui.backRotationValue.textContent='0°';
+ ui.designMode.value='repeat';
+ ui.repeatUpload.classList.remove('hidden');ui.separateUploads.classList.add('hidden');
+ ui.continuousUpload.classList.add('hidden');ui.continuousControls.classList.add('hidden');
+ ui.continuousScale.value=100;ui.continuousOffset.value=0;
+ ui.continuousScaleValue.textContent='100%';ui.continuousOffsetValue.textContent='0%';
+ ui.repeatContinuous.checked=false;ui.flipBackContinuous.checked=true;
+ ui.hook.selectedIndex=0;sessionPaths=clonePaths(currentTemplate.paths);setEditing(false);render();
+});
 $('download').addEventListener('click',()=>{const wasEditing=editing;if(wasEditing)editing=false;render();const a=document.createElement('a');a.download=`xxlgifts-${currentTemplate.id}-mockup.png`;a.href=canvas.toDataURL('image/png');a.click();if(wasEditing){editing=true;render()}});
 function showError(err){
  console.error(err);

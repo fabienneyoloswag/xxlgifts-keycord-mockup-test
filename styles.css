@@ -5,3 +5,30 @@
 .download-template{background:#e30613;color:#fff}.copy-path{background:#111;color:#fff;margin-top:0}
 .save-tools code{font-family:monospace;background:#eee;padding:2px 4px;border-radius:4px}
 @media(max-width:620px){.save-tools{grid-template-columns:1fr}}
+
+.full-range{display:block;width:100%;margin:0}
+.side-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
+.side-card{padding:12px;border:1px solid #ddd;border-radius:11px;background:#fafafa;min-width:0}
+.side-title{display:flex;flex-direction:column;gap:2px;padding-bottom:8px;border-bottom:1px solid #e2e2e2;margin-bottom:8px}
+.side-title span{font-size:10px;font-weight:800}
+.side-title small{font-size:7px;color:#777}
+.side-card .range-label{margin-top:11px}
+.side-card input[type=range]{width:100%;min-width:0}
+@media(max-width:1120px) and (min-width:781px){
+  .side-grid{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  .side-grid{grid-template-columns:1fr}
+}
+
+.mode-panel{margin-top:9px}
+.dual-upload{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.compact-upload{height:104px;padding:8px;text-align:center}
+.compact-upload b{max-width:135px}
+.continuous-check{margin-top:9px}
+.continuous-controls{margin-top:12px;padding:12px;border:1px solid #ddd;border-radius:11px;background:#fafafa}
+.continuous-controls .checkrow{margin-top:14px;background:#fff}
+@media(max-width:520px){
+  .dual-upload{grid-template-columns:1fr}
+  .compact-upload b{max-width:260px}
+}
