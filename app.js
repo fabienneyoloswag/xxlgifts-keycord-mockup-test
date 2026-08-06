@@ -1,78 +1,126 @@
-const c=document.getElementById('canvas'),ctx=c.getContext('2d',{willReadFrequently:true});
-const base=new Image();base.src='mockup-base.png';
-let logo=null, basePixels=null, mask=null;
-const el=id=>document.getElementById(id);
-const controls={file:el('file'),fileName:el('fileName'),color:el('color'),hex:el('hex'),size:el('size'),density:el('density'),rotation:el('rotation'),sizeVal:el('sizeVal'),densityVal:el('densityVal'),rotationVal:el('rotationVal'),empty:el('empty')};
+const W=1680,H=1680;
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+canvas.width=W; canvas.height=H;
 
+const $=id=>document.getElementById(id);
+const ui={
+ logoInput:$('logoInput'),filename:$('filename'),hook:$('hook'),
+ color:$('color'),hex:$('hex'),size:$('size'),spacing:$('spacing'),rotation:$('rotation'),
+ sizeValue:$('sizeValue'),spacingValue:$('spacingValue'),rotationValue:$('rotationValue'),
+ empty:$('empty'),loading:$('loading')
+};
+
+const paths={
+ base:'assets/20mm/base.png',
+ colorMask:'assets/20mm/color-mask.png',
+ designMask:'assets/20mm/design-mask.png',
+ overlay:'assets/20mm/overlay.png',
+ shadow:'assets/20mm/shadow.png',
+ duimhaak:'assets/20mm/duimhaak.png',
+ ovaalhaak:'assets/20mm/ovaalhaak.png',
+ karabijnhaak:'assets/20mm/karabijnhaak.png',
+ 'cliphaak-luxe':'assets/20mm/cliphaak-luxe.png',
+ krokodil:'assets/20mm/krokodil.png',
+ sleutelring:'assets/20mm/sleutelring.png'
+};
+const assets={}; let logo=null;
+
+function loadImage(src){
+ return new Promise((resolve,reject)=>{
+  const im=new Image(); im.onload=()=>resolve(im); im.onerror=reject; im.src=src;
+ });
+}
+async function init(){
+ for(const [key,path] of Object.entries(paths)) assets[key]=await loadImage(path);
+ ui.loading.style.display='none'; render();
+}
 function rgb(hex){return [parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)]}
-function isCyan(r,g,b){return b>95&&g>90&&g>r*1.18&&b>r*1.12&&Math.abs(g-b)<100}
-function prep(){
- c.width=base.width;c.height=base.height;
- ctx.drawImage(base,0,0);
- basePixels=ctx.getImageData(0,0,c.width,c.height);
- mask=new Uint8ClampedArray(c.width*c.height);
- for(let i=0,p=0;i<basePixels.data.length;i+=4,p++){
-  const r=basePixels.data[i],g=basePixels.data[i+1],b=basePixels.data[i+2];
-  if(isCyan(r,g,b)) mask[p]=Math.min(255,Math.max(0,((g+b)/2-r)*3.1));
- }
- render();
+function offscreen(){const c=document.createElement('canvas');c.width=W;c.height=H;return c}
+function coloredMask(){
+ const c=offscreen(),g=c.getContext('2d');
+ g.drawImage(assets.colorMask,0,0);
+ g.globalCompositeOperation='source-in';
+ g.fillStyle=ui.color.value;g.fillRect(0,0,W,H);
+ return c;
 }
-function recolor(){
- const out=new ImageData(new Uint8ClampedArray(basePixels.data),c.width,c.height);
- const [tr,tg,tb]=rgb(controls.color.value);
- for(let i=0,p=0;i<out.data.length;i+=4,p++){
-  const a=mask[p]/255;if(a<=0)continue;
-  const r=basePixels.data[i],g=basePixels.data[i+1],b=basePixels.data[i+2];
-  const lum=(r*.22+g*.60+b*.18)/255;
-  const shade=.30+lum*.94;
-  const nr=Math.min(255,tr*shade),ng=Math.min(255,tg*shade),nb=Math.min(255,tb*shade);
-  out.data[i]=r*(1-a)+nr*a;out.data[i+1]=g*(1-a)+ng*a;out.data[i+2]=b*(1-a)+nb*a;
- }
- ctx.putImageData(out,0,0);
-}
-function contain(g,img,maxW,maxH){
+function drawContained(g,img,maxW,maxH){
  const s=Math.min(maxW/img.width,maxH/img.height);
  g.drawImage(img,-img.width*s/2,-img.height*s/2,img.width*s,img.height*s);
 }
-function makeMaskCanvas(){
- const m=document.createElement('canvas');m.width=c.width;m.height=c.height;
- const mx=m.getContext('2d');const im=mx.createImageData(c.width,c.height);
- for(let p=0,i=0;p<mask.length;p++,i+=4){im.data[i]=255;im.data[i+1]=255;im.data[i+2]=255;im.data[i+3]=mask[p]}
- mx.putImageData(im,0,0);return m;
-}
-function drawLogos(){
- if(!logo)return;
- const layer=document.createElement('canvas');layer.width=c.width;layer.height=c.height;const g=layer.getContext('2d');
- const s=Number(controls.size.value),rot=Number(controls.rotation.value);
- const dense=Number(controls.density.value);
- const placements=[
-  [440,1115,-30],[610,1012,-30],[780,910,-30],[950,810,-30],[1120,710,-30],[1290,610,-30],[1460,510,-30],
-  [570,1225,-30],[740,1125,-30],[910,1025,-30],[1080,925,-30],
-  [960,795,-30],[1115,705,-30],[1270,615,-30],[1425,525,-30],
-  [1040,570,-30],[1170,495,-30],[1300,420,-30],[1430,350,-30]
+function logoLayer(){
+ const c=offscreen(),g=c.getContext('2d');
+ if(!logo)return c;
+ const size=Number(ui.size.value),extra=Number(ui.rotation.value);
+ // Exact template coordinates at 1680×1680.
+ const main=[
+  [405,1114,-30],[500,1057,-30],[596,1000,-30],[692,943,-30],
+  [788,886,-30],[884,829,-30],[980,772,-30],[1076,715,-30],
+  [1172,658,-30],[1268,601,-30],[1364,544,-30]
  ];
- const stride=dense===1?3:dense===2?2:1;
- placements.forEach((p,i)=>{if(i%stride)return;g.save();g.translate(p[0],p[1]);g.rotate((p[2]+rot)*Math.PI/180);contain(g,logo,s*2.45,s*.68);g.restore()});
- // Logos on the upper returning strap.
- const upper=[[1260,505,28],[1370,435,31],[1470,365,35]];
- upper.forEach((p,i)=>{if(i%stride)return;g.save();g.translate(p[0],p[1]);g.rotate((p[2]+rot)*Math.PI/180);contain(g,logo,s*2.2,s*.64);g.restore()});
- g.globalCompositeOperation='destination-in';g.drawImage(makeMaskCanvas(),0,0);
- ctx.save();ctx.globalAlpha=.96;ctx.drawImage(layer,0,0);ctx.restore();
+ const returnSide=[
+  [944,806,-30],[1045,747,-30],[1146,688,-30],[1247,629,-30],
+  [1348,570,-30],[1445,507,-30]
+ ];
+ const loop=[
+  [1370,500,31],[1432,454,35],[1487,411,39]
+ ];
+ const step=ui.spacing.value==='1'?3:ui.spacing.value==='2'?2:1;
+ [...main,...returnSide,...loop].forEach(([x,y,deg],i)=>{
+  if(i%step!==0)return;
+  g.save();g.translate(x,y);g.rotate((deg+extra)*Math.PI/180);
+  drawContained(g,logo,size*2.5,size*.72);
+  g.restore();
+ });
+ g.globalCompositeOperation='destination-in';
+ g.drawImage(assets.designMask,0,0);
+ return c;
 }
-function addTexture(){
- // Reapply a subtle luminance layer so the textile shading remains visible above the print.
- const shade=document.createElement('canvas');shade.width=c.width;shade.height=c.height;const sx=shade.getContext('2d');
- const im=sx.createImageData(c.width,c.height);
- for(let p=0,i=0;p<mask.length;p++,i+=4){if(!mask[p])continue;const r=basePixels.data[i],g=basePixels.data[i+1],b=basePixels.data[i+2];const lum=(r+g+b)/3;const delta=lum-150;if(delta>16){im.data[i]=255;im.data[i+1]=255;im.data[i+2]=255;im.data[i+3]=Math.min(55,delta*.45)}else if(delta<-16){im.data[i]=0;im.data[i+1]=0;im.data[i+2]=0;im.data[i+3]=Math.min(42,-delta*.34)}}sx.putImageData(im,0,0);ctx.drawImage(shade,0,0);
-}
-function render(){if(!basePixels)return;recolor();drawLogos();addTexture()}
-base.onload=prep;
+function render(){
+ if(!assets.base)return;
+ ctx.clearRect(0,0,W,H);
+ ctx.fillStyle='#f7f7f7';ctx.fillRect(0,0,W,H);
 
-controls.file.addEventListener('change',()=>{const f=controls.file.files?.[0];if(!f)return;const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{logo=im;controls.fileName.textContent=f.name;controls.empty.style.display='none';URL.revokeObjectURL(u);render()};im.src=u});
-controls.color.addEventListener('input',()=>{controls.hex.value=controls.color.value.toUpperCase();render()});
-controls.hex.addEventListener('input',()=>{if(/^#[0-9a-fA-F]{6}$/.test(controls.hex.value)){controls.color.value=controls.hex.value;render()}});
-controls.size.addEventListener('input',()=>{controls.sizeVal.textContent=controls.size.value+'%';render()});
-controls.density.addEventListener('input',()=>{controls.densityVal.textContent=['','Ruim','Normaal','Compact'][controls.density.value];render()});
-controls.rotation.addEventListener('input',()=>{controls.rotationVal.textContent=controls.rotation.value+'°';render()});
-el('reset').addEventListener('click',()=>{controls.color.value='#e30613';controls.hex.value='#E30613';controls.size.value=72;controls.density.value=2;controls.rotation.value=0;controls.sizeVal.textContent='72%';controls.densityVal.textContent='Normaal';controls.rotationVal.textContent='0°';render()});
-el('download').addEventListener('click',()=>{const a=document.createElement('a');a.download='xxlgifts-echte-psd-mockup.png';a.href=c.toDataURL('image/png');a.click()});
+ // Achtergrondschaduw uit PSD.
+ ctx.drawImage(assets.shadow,0,0);
+
+ // Kleurvlak.
+ ctx.drawImage(coloredMask(),0,0);
+
+ // Basistextuur: wit/grijs vermenigvuldigt met de gekozen kleur.
+ ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.70;
+ ctx.drawImage(assets.base,0,0);ctx.restore();
+
+ // Bedrukking.
+ if(logo)ctx.drawImage(logoLayer(),0,0);
+
+ // PSD-overlay boven de bedrukking voor textuur, randen en bochten.
+ ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.72;
+ ctx.drawImage(assets.overlay,0,0);ctx.restore();
+
+ // Gekozen echte haaklaag.
+ ctx.drawImage(assets[ui.hook.value],0,0);
+}
+ui.logoInput.addEventListener('change',()=>{
+ const file=ui.logoInput.files?.[0];if(!file)return;
+ const url=URL.createObjectURL(file),im=new Image();
+ im.onload=()=>{logo=im;ui.filename.textContent=file.name;ui.empty.style.display='none';URL.revokeObjectURL(url);render()};
+ im.onerror=()=>{URL.revokeObjectURL(url);alert('Dit logo kon niet worden geopend.')};
+ im.src=url;
+});
+ui.hook.addEventListener('change',render);
+ui.color.addEventListener('input',()=>{ui.hex.value=ui.color.value.toUpperCase();render()});
+ui.hex.addEventListener('input',()=>{if(/^#[0-9A-Fa-f]{6}$/.test(ui.hex.value)){ui.color.value=ui.hex.value;render()}});
+ui.size.addEventListener('input',()=>{ui.sizeValue.textContent=ui.size.value+'%';render()});
+ui.spacing.addEventListener('input',()=>{ui.spacingValue.textContent=['','Ruim','Normaal','Compact'][ui.spacing.value];render()});
+ui.rotation.addEventListener('input',()=>{ui.rotationValue.textContent=ui.rotation.value+'°';render()});
+$('reset').addEventListener('click',()=>{
+ ui.hook.value='duimhaak';ui.color.value='#e30613';ui.hex.value='#E30613';
+ ui.size.value=70;ui.spacing.value=2;ui.rotation.value=0;
+ ui.sizeValue.textContent='70%';ui.spacingValue.textContent='Normaal';ui.rotationValue.textContent='0°';render();
+});
+$('download').addEventListener('click',()=>{
+ const a=document.createElement('a');a.download='xxlgifts-20mm-keycord-mockup.png';
+ a.href=canvas.toDataURL('image/png');a.click();
+});
+init().catch(err=>{console.error(err);ui.loading.textContent='De mockupbestanden konden niet laden.'});
