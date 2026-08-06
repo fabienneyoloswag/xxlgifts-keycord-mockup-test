@@ -13,17 +13,20 @@
 <body>
 <header class="topbar">
   <div class="brandmark">XXL</div>
-  <div class="brandcopy"><strong>Mockup Studio</strong><span>Echte PSD-lagen · 20 mm standaard</span></div>
+  <div class="brandcopy"><strong>Mockup Studio</strong><span>Template Engine v2</span></div>
   <div class="live"><i></i> Live</div>
 </header>
 
 <main class="workspace">
   <aside class="controls">
-    <p class="eyebrow">Mockup Engine v1</p>
-    <h1>20 mm keycord</h1>
-    <p class="intro">Deze preview wordt opgebouwd uit de echte base, maskers, overlay, schaduw en haaklagen uit jouw PSD.</p>
+    <p class="eyebrow">Schaalbare template-engine</p>
+    <h1>Keycord mockup</h1>
+    <p class="intro">Templates worden automatisch ingelezen uit <code>templates.json</code>. Nieuwe breedtes en varianten hebben alleen nieuwe bestanden en één configuratieregel nodig.</p>
 
-    <label class="title">1. Logo uploaden</label>
+    <label class="title">1. Template</label>
+    <select id="template"></select>
+
+    <label class="title">2. Logo uploaden</label>
     <label class="upload">
       <span class="plus">+</span>
       <b id="filename">Kies SVG of PNG</b>
@@ -31,17 +34,10 @@
       <input id="logoInput" type="file" accept=".svg,.png,.jpg,.jpeg,.webp,image/*">
     </label>
 
-    <label class="title">2. Haak kiezen</label>
-    <select id="hook">
-      <option value="duimhaak">Duimhaak</option>
-      <option value="ovaalhaak">Ovaalhaak</option>
-      <option value="karabijnhaak">Karabijnhaak</option>
-      <option value="cliphaak-luxe">Cliphaak luxe</option>
-      <option value="krokodil">Krokodil</option>
-      <option value="sleutelring">Sleutelring</option>
-    </select>
+    <label class="title">3. Haak kiezen</label>
+    <select id="hook"></select>
 
-    <label class="title">3. Keycordkleur</label>
+    <label class="title">4. Keycordkleur</label>
     <div class="colorrow">
       <input id="color" type="color" value="#e30613">
       <input id="hex" value="#E30613" maxlength="7">
@@ -64,15 +60,15 @@
 
   <section class="preview">
     <div class="previewhead">
-      <div><small>LIVE RESULTAAT</small><h2>20 mm sublimatie · standaard</h2></div>
-      <span>ECHTE LAGEN</span>
+      <div><small>LIVE RESULTAAT</small><h2 id="previewTitle">Template laden…</h2></div>
+      <span>ECHTE PSD-LAGEN</span>
     </div>
     <div class="stage">
       <canvas id="canvas"></canvas>
-      <div id="empty"><b>Upload een logo</b><small>De keycordkleur en haak werken al direct.</small></div>
+      <div id="empty"><b>Upload een logo</b><small>Template, kleur en haak werken al direct.</small></div>
       <div id="loading">Mockup laden…</div>
     </div>
-    <div class="note"><b>Opbouw:</b> schaduw → kleurmasker → herhaald logo via designmasker → stofstructuur → overlay → gekozen haak.</div>
+    <div class="note"><b>Voor uitbreiding:</b> upload later bestanden zoals <code>20mm-buckle-base.png</code> en voeg de template toe aan <code>templates.json</code>. De websitecode blijft hetzelfde.</div>
   </section>
 </main>
 <script src="app.js"></script>

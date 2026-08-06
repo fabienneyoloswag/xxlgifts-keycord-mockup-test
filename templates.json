@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "id": "20mm-normal",
+      "label": "20 mm standaard",
+      "material": "Sublimatie",
+      "width": 20,
+      "variant": "normal",
+      "canvas": {
+        "width": 1680,
+        "height": 1680
+      },
+      "files": {
+        "base": "20mm-normal-base.png",
+        "colorMask": "20mm-normal-color-mask.png",
+        "designMask": "20mm-normal-design-mask.png",
+        "overlay": "20mm-normal-overlay.png",
+        "shadow": "20mm-normal-shadow.png"
+      },
+      "hooks": [
+        {
+          "id": "duimhaak",
+          "label": "Duimhaak",
+          "file": "20mm-normal-duimhaak.png"
+        },
+        {
+          "id": "ovaalhaak",
+          "label": "Ovaalhaak",
+          "file": "20mm-normal-ovaalhaak.png"
+        },
+        {
+          "id": "karabijnhaak",
+          "label": "Karabijnhaak",
+          "file": "20mm-normal-karabijnhaak.png"
+        },
+        {
+          "id": "cliphaak-luxe",
+          "label": "Cliphaak luxe",
+          "file": "20mm-normal-cliphaak-luxe.png"
+        },
+        {
+          "id": "krokodil",
+          "label": "Krokodil",
+          "file": "20mm-normal-krokodil.png"
+        },
+        {
+          "id": "sleutelring",
+          "label": "Sleutelring",
+          "file": "20mm-normal-sleutelring.png"
+        }
+      ],
+      "logoPlacements": [
+        [
+          405,
+          1114,
+          -30
+        ],
+        [
+          500,
+          1057,
+          -30
+        ],
+        [
+          596,
+          1000,
+          -30
+        ],
+        [
+          692,
+          943,
+          -30
+        ],
+        [
+          788,
+          886,
+          -30
+        ],
+        [
+          884,
+          829,
+          -30
+        ],
+        [
+          980,
+          772,
+          -30
+        ],
+        [
+          1076,
+          715,
+          -30
+        ],
+        [
+          1172,
+          658,
+          -30
+        ],
+        [
+          1268,
+          601,
+          -30
+        ],
+        [
+          1364,
+          544,
+          -30
+        ],
+        [
+          944,
+          806,
+          -30
+        ],
+        [
+          1045,
+          747,
+          -30
+        ],
+        [
+          1146,
+          688,
+          -30
+        ],
+        [
+          1247,
+          629,
+          -30
+        ],
+        [
+          1348,
+          570,
+          -30
+        ],
+        [
+          1445,
+          507,
+          -30
+        ],
+        [
+          1370,
+          500,
+          31
+        ],
+        [
+          1432,
+          454,
+          35
+        ],
+        [
+          1487,
+          411,
+          39
+        ]
+      ]
+    }
+  ]
+}
