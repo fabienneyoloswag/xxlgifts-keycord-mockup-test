@@ -52,7 +52,7 @@ async function loadTemplate(id){
  ui.pathSelect.innerHTML='';sessionPaths.forEach((p,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=p.label||p.id;ui.pathSelect.appendChild(o)});
  ui.previewTitle.textContent=`${currentTemplate.label} · ${currentTemplate.material}`;
  const front=sessionPaths.find(p=>p.id==='front'),back=sessionPaths.find(p=>p.id==='back');
- ui.frontCount.value=front?.defaultLogoCount||7;ui.backCount.value=back?.defaultLogoCount||5;
+ ui.frontCount.value=front?.defaultLogoCount||7;ui.backCount.value=back?.defaultLogoCount||7;
  ui.frontCountValue.textContent=ui.frontCount.value;ui.backCountValue.textContent=ui.backCount.value;
  ui.loading.style.display='none';ui.saveTools.classList.remove('hidden');render();
 }
@@ -218,11 +218,11 @@ ui.copyPath.addEventListener('click',async()=>{
 canvas.addEventListener('mousedown',beginPointer);canvas.addEventListener('mousemove',movePointer);window.addEventListener('mouseup',endPointer);canvas.addEventListener('touchstart',beginPointer,{passive:false});canvas.addEventListener('touchmove',movePointer,{passive:false});window.addEventListener('touchend',endPointer);
 $('reset').addEventListener('click',()=>{
  ui.color.value='#e30613';ui.hex.value='#E30613';ui.size.value=52;
- ui.frontCount.value=7;ui.backCount.value=5;
+ ui.frontCount.value=7;ui.backCount.value=7;
  ui.frontOffset.value=0;ui.backOffset.value=0;
  ui.frontRotation.value=0;ui.backRotation.value=0;
  ui.sizeValue.textContent='52%';
- ui.frontCountValue.textContent='7';ui.backCountValue.textContent='5';
+ ui.frontCountValue.textContent='7';ui.backCountValue.textContent='7';
  ui.frontOffsetValue.textContent='0%';ui.backOffsetValue.textContent='0%';
  ui.frontRotationValue.textContent='0°';ui.backRotationValue.textContent='0°';
  ui.designMode.value='repeat';
