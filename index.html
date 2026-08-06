@@ -1,129 +1,68 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0f0f10" />
-  <title>XXLGifts Keycord Mockup Studio</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111111">
+  <title>XXLGifts PSD Mockup Test</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="app-shell">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark">XXL</div>
-        <div>
-          <strong>Mockup Studio</strong>
-          <span>Keycord configurator · prototype</span>
-        </div>
-      </div>
-      <div class="status"><span></span> Live preview</div>
-    </header>
+<header>
+  <div class="logo">XXL</div>
+  <div><strong>PSD Mockup Test</strong><span>Echte 20 mm sublimatie-mockup</span></div>
+  <i></i>
+</header>
 
-    <div class="workspace">
-      <aside class="controls">
-        <div class="intro">
-          <div class="eyebrow">✦ Werkende prototypeversie</div>
-          <h1>Stel een keycord samen</h1>
-          <p>Upload één logo, kies de uitvoering en bekijk direct een realistische conceptpreview.</p>
-        </div>
+<main>
+  <aside>
+    <p class="tag">Proof of concept 02</p>
+    <h1>Echte PSD-mockup</h1>
+    <p class="intro">Deze versie gebruikt de samengestelde afbeelding uit jouw originele PSD, niet een getekende keycord.</p>
 
-        <section class="panel-section">
-          <label class="section-label">1. Logo</label>
-          <label class="upload-box">
-            <span class="upload-icon">＋</span>
-            <strong id="logoName">Logo uploaden</strong>
-            <span>SVG, PNG, JPG of WEBP</span>
-            <input id="logoInput" type="file" accept=".svg,.png,.jpg,.jpeg,.webp,image/*" />
-          </label>
-        </section>
+    <label class="title">1. Upload logo</label>
+    <label class="upload">
+      <b id="fileName">Kies SVG of PNG</b>
+      <span>Transparante bestanden werken het mooist</span>
+      <input id="file" type="file" accept=".svg,.png,.jpg,.jpeg,.webp,image/*">
+    </label>
 
-        <section class="panel-section two-cols">
-          <div>
-            <label class="section-label">Variant</label>
-            <select id="variant">
-              <option value="normal">Normaal</option>
-              <option value="buckle">Buckle</option>
-              <option value="safety">Safety</option>
-              <option value="buckle-safety">Buckle + safety</option>
-            </select>
-          </div>
-          <div>
-            <label class="section-label">Haak</label>
-            <select id="hook">
-              <option value="lobster">Lobster claw</option>
-              <option value="oval">Oval hook</option>
-              <option value="plastic">Plastic hook</option>
-              <option value="jhook">J-hook</option>
-              <option value="bulldog">Bulldog clip</option>
-              <option value="badge">Badgereel</option>
-            </select>
-          </div>
-        </section>
-
-        <section class="panel-section">
-          <label class="section-label">2. Keycordkleur</label>
-          <div class="color-row">
-            <input id="keycordColor" type="color" value="#e30613" />
-            <input id="colorText" class="text-input" value="#E30613" maxlength="7" />
-          </div>
-        </section>
-
-        <section class="panel-section">
-          <label class="range-label"><span>Logoformaat</span><strong id="logoScaleValue">58%</strong></label>
-          <input id="logoScale" type="range" min="30" max="90" value="58" />
-
-          <label class="range-label"><span>Herhalingen</span><strong id="repeatsValue">7</strong></label>
-          <input id="repeats" type="range" min="4" max="10" value="7" />
-
-          <label class="range-label"><span>Logo draaien</span><strong id="angleValue">0°</strong></label>
-          <input id="angle" type="range" min="-20" max="20" value="0" />
-        </section>
-
-        <section class="panel-section">
-          <label class="section-label">Achtergrond</label>
-          <div class="swatches">
-            <button class="swatch active" data-color="#f2f2f2" style="background:#f2f2f2"></button>
-            <button class="swatch" data-color="#ffffff" style="background:#ffffff"></button>
-            <button class="swatch" data-color="#171717" style="background:#171717"></button>
-            <button class="swatch" data-color="#e9e3da" style="background:#e9e3da"></button>
-          </div>
-        </section>
-
-        <div class="actions">
-          <button id="resetButton" class="secondary">↺ Reset</button>
-          <button id="downloadButton" class="primary">↓ PNG downloaden</button>
-        </div>
-      </aside>
-
-      <section class="preview-area">
-        <div class="preview-header">
-          <div>
-            <span class="preview-kicker">Live resultaat</span>
-            <h2 id="previewTitle">20 mm sublimatie · normaal</h2>
-          </div>
-          <span class="prototype-badge">Prototype</span>
-        </div>
-
-        <div class="canvas-wrap">
-          <canvas id="previewCanvas"></canvas>
-          <div id="emptyState" class="empty-state">
-            <span class="upload-icon big">＋</span>
-            <strong>Upload links een logo</strong>
-            <span>Daarna verschijnt het automatisch op het keycord.</span>
-          </div>
-        </div>
-
-        <div class="notice">
-          <strong>Dit werkt nu:</strong> logo uploaden, kleur, variant, haak, logoformaat,
-          herhaling, rotatie en PNG-export. De echte PSD-lagen worden hierna gekoppeld.
-        </div>
-      </section>
+    <label class="title">2. Keycordkleur</label>
+    <div class="color">
+      <input id="color" type="color" value="#e30613">
+      <input id="hex" value="#E30613" maxlength="7">
     </div>
-  </main>
-  <script src="app.js"></script>
+
+    <label class="slider"><span>Logoformaat</span><b id="sizeVal">72%</b></label>
+    <input id="size" type="range" min="40" max="110" value="72">
+
+    <label class="slider"><span>Dichtheid</span><b id="densityVal">Normaal</b></label>
+    <input id="density" type="range" min="1" max="3" value="2">
+
+    <label class="slider"><span>Logo draaien</span><b id="rotationVal">0°</b></label>
+    <input id="rotation" type="range" min="-15" max="15" value="0">
+
+    <div class="buttons">
+      <button id="reset">Reset</button>
+      <button id="download">PNG downloaden</button>
+    </div>
+  </aside>
+
+  <section>
+    <div class="head">
+      <div><small>LIVE RESULTAAT</small><h2>Originele 20 mm mockup</h2></div>
+      <em>PSD BASIS</em>
+    </div>
+    <div class="stage">
+      <canvas id="canvas"></canvas>
+      <div id="empty"><b>Upload een logo</b><span>De echte mockup blijft direct zichtbaar.</span></div>
+    </div>
+    <p class="note"><b>Wat dit bewijst:</b> de echte PSD-render kan online als basis worden gebruikt, het lint kan van kleur veranderen en de logo-opdruk kan binnen het echte product worden gemaskeerd. De volgende stap is de PSD eenmalig exporteren naar afzonderlijke overlay-, schaduw-, haak- en accessoirelagen.</p>
+  </section>
+</main>
+<script src="app.js"></script>
 </body>
 </html>
