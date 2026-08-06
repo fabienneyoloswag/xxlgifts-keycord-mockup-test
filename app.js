@@ -16,6 +16,9 @@ let editing=false,dragging=null,sessionPaths=[];
 
 function loadImage(src){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Kon '+src+' niet laden'));im.src=src})}
 function offscreen(){const c=document.createElement('canvas');c.width=canvas.width;c.height=canvas.height;return c}
+function drawFull(g,img){
+ g.drawImage(img,0,0,g.canvas.width,g.canvas.height);
+}
 function drawContained(g,img,maxW,maxH){const s=Math.min(maxW/img.width,maxH/img.height);g.drawImage(img,-img.width*s/2,-img.height*s/2,img.width*s,img.height*s)}
 function clonePaths(paths){return JSON.parse(JSON.stringify(paths||[]))}
 
@@ -35,12 +38,12 @@ async function loadTemplate(id){
  ui.loading.style.display='none';ui.saveTools.classList.remove('hidden');render();
 }
 function maskFill(mask,color){
- const c=offscreen(),g=c.getContext('2d');g.drawImage(mask,0,0);
+ const c=offscreen(),g=c.getContext('2d');drawFull(g,mask);
  g.globalCompositeOperation='source-in';g.fillStyle=color;g.fillRect(0,0,c.width,c.height);return c;
 }
 function clippedTexture(mask,source,alpha=.7){
- const c=offscreen(),g=c.getContext('2d');g.drawImage(source,0,0);
- g.globalCompositeOperation='destination-in';g.drawImage(mask,0,0);
+ const c=offscreen(),g=c.getContext('2d');drawFull(g,source);
+ g.globalCompositeOperation='destination-in';drawFull(g,mask);
  c._alpha=alpha;return c;
 }
 function pathLength(points){let total=0;for(let i=1;i<points.length;i++)total+=Math.hypot(points[i][0]-points[i-1][0],points[i][1]-points[i-1][1]);return total}
@@ -62,14 +65,14 @@ function logosForPath(path,count){
   g.save();g.translate(pos.x,pos.y);g.rotate(pos.angle+(path.rotationOffset||0)*Math.PI/180+extra);
   drawContained(g,logo,size*2.12,size*.58);g.restore();
  }
- g.globalCompositeOperation='destination-in';g.drawImage(assets[path.mask],0,0);return c;
+ g.globalCompositeOperation='destination-in';drawFull(g,assets[path.mask]);return c;
 }
 function drawRibbonSide(path,count){
  const mask=assets[path.mask];
- ctx.drawImage(maskFill(mask,ui.color.value),0,0);
+ drawFull(ctx,maskFill(mask,ui.color.value));
  const texture=clippedTexture(mask,assets.base);
- ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.70;ctx.drawImage(texture,0,0);ctx.restore();
- if(logo)ctx.drawImage(logosForPath(path,count),0,0);
+ ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.70;drawFull(ctx,texture);ctx.restore();
+ if(logo)drawFull(ctx,logosForPath(path,count));
 }
 function drawEditor(){
  if(!editing)return;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
@@ -79,12 +82,12 @@ function drawEditor(){
 function render(){
  if(!currentTemplate||!assets.base)return;
  ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#f7f7f7';ctx.fillRect(0,0,canvas.width,canvas.height);
- ctx.drawImage(assets.shadow,0,0);
+ drawFull(ctx,assets.shadow);
  const back=sessionPaths.find(p=>p.id==='back'),front=sessionPaths.find(p=>p.id==='front');
  if(back)drawRibbonSide(back,Number(ui.backCount.value));
  if(front)drawRibbonSide(front,Number(ui.frontCount.value));
- ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.72;ctx.drawImage(assets.overlay,0,0);ctx.restore();
- ctx.drawImage(assets['hook:'+ui.hook.value],0,0);drawEditor();
+ ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.72;drawFull(ctx,assets.overlay);ctx.restore();
+ drawFull(ctx,assets['hook:'+ui.hook.value]);drawEditor();
 }
 function canvasPoint(event){const rect=canvas.getBoundingClientRect(),p=event.touches?.[0]||event.changedTouches?.[0]||event;return{x:(p.clientX-rect.left)*canvas.width/rect.width,y:(p.clientY-rect.top)*canvas.height/rect.height}}
 function nearestPoint(x,y){let best=null,bestDist=40;sessionPaths.forEach((path,pi)=>path.points.forEach((p,i)=>{const d=Math.hypot(x-p[0],y-p[1]);if(d<bestDist){best={pathIndex:pi,pointIndex:i};bestDist=d}}));return best}
@@ -139,5 +142,9 @@ ui.copyPath.addEventListener('click',async()=>{
 canvas.addEventListener('mousedown',beginPointer);canvas.addEventListener('mousemove',movePointer);window.addEventListener('mouseup',endPointer);canvas.addEventListener('touchstart',beginPointer,{passive:false});canvas.addEventListener('touchmove',movePointer,{passive:false});window.addEventListener('touchend',endPointer);
 $('reset').addEventListener('click',()=>{ui.color.value='#e30613';ui.hex.value='#E30613';ui.size.value=52;ui.frontCount.value=7;ui.backCount.value=5;ui.offset.value=0;ui.rotation.value=0;ui.sizeValue.textContent='52%';ui.frontCountValue.textContent='7';ui.backCountValue.textContent='5';ui.offsetValue.textContent='0%';ui.rotationValue.textContent='0°';ui.hook.selectedIndex=0;sessionPaths=clonePaths(currentTemplate.paths);setEditing(false);render()});
 $('download').addEventListener('click',()=>{const wasEditing=editing;if(wasEditing)editing=false;render();const a=document.createElement('a');a.download=`xxlgifts-${currentTemplate.id}-mockup.png`;a.href=canvas.toDataURL('image/png');a.click();if(wasEditing){editing=true;render()}});
-function showError(err){console.error(err);ui.loading.style.display='flex';ui.loading.textContent='Fout: '+err.message}
+function showError(err){
+ console.error(err);
+ ui.loading.style.display='flex';
+ ui.loading.textContent='Fout: '+err.message;
+}
 init().catch(showError);
