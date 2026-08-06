@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#111111" />
+  <meta name="theme-color" content="#0f0f10" />
   <title>XXLGifts Keycord Mockup Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,16 +13,22 @@
 <body>
   <main class="app-shell">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">XXL</div><div><strong>Mockup Studio</strong><span>Keycord proof of concept</span></div></div>
+      <div class="brand">
+        <div class="brand-mark">XXL</div>
+        <div>
+          <strong>Mockup Studio</strong>
+          <span>Keycord configurator · prototype</span>
+        </div>
+      </div>
       <div class="status"><span></span> Live preview</div>
     </header>
 
     <div class="workspace">
       <aside class="controls">
         <div class="intro">
-          <div class="eyebrow">✦ Sprint 1</div>
-          <h1>Maak een keycordpatroon</h1>
-          <p>Upload één logo en stel de eerste visuele basis in. De echte PSD-mockup wordt in de volgende stap gekoppeld.</p>
+          <div class="eyebrow">✦ Werkende prototypeversie</div>
+          <h1>Stel een keycord samen</h1>
+          <p>Upload één logo, kies de uitvoering en bekijk direct een realistische conceptpreview.</p>
         </div>
 
         <section class="panel-section">
@@ -35,6 +41,29 @@
           </label>
         </section>
 
+        <section class="panel-section two-cols">
+          <div>
+            <label class="section-label">Variant</label>
+            <select id="variant">
+              <option value="normal">Normaal</option>
+              <option value="buckle">Buckle</option>
+              <option value="safety">Safety</option>
+              <option value="buckle-safety">Buckle + safety</option>
+            </select>
+          </div>
+          <div>
+            <label class="section-label">Haak</label>
+            <select id="hook">
+              <option value="lobster">Lobster claw</option>
+              <option value="oval">Oval hook</option>
+              <option value="plastic">Plastic hook</option>
+              <option value="jhook">J-hook</option>
+              <option value="bulldog">Bulldog clip</option>
+              <option value="badge">Badgereel</option>
+            </select>
+          </div>
+        </section>
+
         <section class="panel-section">
           <label class="section-label">2. Keycordkleur</label>
           <div class="color-row">
@@ -44,8 +73,8 @@
         </section>
 
         <section class="panel-section">
-          <label class="range-label"><span>Logoformaat</span><strong id="logoScaleValue">56%</strong></label>
-          <input id="logoScale" type="range" min="30" max="90" value="56" />
+          <label class="range-label"><span>Logoformaat</span><strong id="logoScaleValue">58%</strong></label>
+          <input id="logoScale" type="range" min="30" max="90" value="58" />
 
           <label class="range-label"><span>Herhalingen</span><strong id="repeatsValue">7</strong></label>
           <input id="repeats" type="range" min="4" max="10" value="7" />
@@ -71,12 +100,27 @@
       </aside>
 
       <section class="preview-area">
-        <div class="preview-header"><div><span class="preview-kicker">Live resultaat</span><h2>20 mm sublimatie keycord</h2></div><span class="prototype-badge">Prototype</span></div>
+        <div class="preview-header">
+          <div>
+            <span class="preview-kicker">Live resultaat</span>
+            <h2 id="previewTitle">20 mm sublimatie · normaal</h2>
+          </div>
+          <span class="prototype-badge">Prototype</span>
+        </div>
+
         <div class="canvas-wrap">
           <canvas id="previewCanvas"></canvas>
-          <div id="emptyState" class="empty-state"><span class="upload-icon big">＋</span><strong>Upload links een logo</strong><span>Daarna verschijnt het automatisch op het keycord.</span></div>
+          <div id="emptyState" class="empty-state">
+            <span class="upload-icon big">＋</span>
+            <strong>Upload links een logo</strong>
+            <span>Daarna verschijnt het automatisch op het keycord.</span>
+          </div>
         </div>
-        <div class="notice"><strong>Wat werkt nu:</strong> upload, kleur, logogrootte, herhaling, rotatie en PNG-export. De volgende technische test wordt het renderen met de echte PSD-lagen.</div>
+
+        <div class="notice">
+          <strong>Dit werkt nu:</strong> logo uploaden, kleur, variant, haak, logoformaat,
+          herhaling, rotatie en PNG-export. De echte PSD-lagen worden hierna gekoppeld.
+        </div>
       </section>
     </div>
   </main>

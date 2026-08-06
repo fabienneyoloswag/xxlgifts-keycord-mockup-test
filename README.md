@@ -1,12 +1,14 @@
-# XXLGifts Keycord Mockup Test
+# XXLGifts Keycord Mockup Studio
 
-Werkende eerste proof of concept zonder build dependencies.
+Werkende statische prototypeversie voor Vercel.
 
 ## Functies
-- Logo uploaden als SVG, PNG, JPG of WEBP
-- Keycordkleur aanpassen
-- Logoformaat, herhaling en rotatie instellen
-- Achtergrond kiezen
+- Logo uploaden
+- Keycordkleur instellen
+- Variant kiezen: normaal, buckle, safety, buckle + safety
+- Haak kiezen
+- Logoformaat, herhaling en rotatie aanpassen
 - PNG downloaden
 
-De huidige keycordvorm is een technische browser-preview. In de volgende fase wordt de echte PSD vertaald naar renderbare lagen en maskers.
+## Belangrijk
+Deze versie gebruikt nog een browsermatige conceptmockup. In de volgende fase worden de echte PSD-lagen, maskers, haken en badge reel gekoppeld.
