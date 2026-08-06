@@ -147,9 +147,14 @@
       <p>Klik in de preview om punten toe te voegen. Sleep een bestaand punt om het te verplaatsen.</p>
     </div>
 
+    <div class="demo-warning">
+      <b>Demo – nog niet gekoppeld</b>
+      <span>Deze knop verstuurt nog geen e-mail. Je ziet alleen welke gegevens later naar XXLGifts worden verzonden.</span>
+    </div>
+
     <div class="actions">
       <button id="reset" class="secondary">Reset</button>
-      <button id="download" class="primary">PNG downloaden</button>
+      <button id="download" class="primary quote-button">Voorbeeld offerteaanvraag</button>
     </div>
   </aside>
 
@@ -172,6 +177,68 @@
     </div>
   </section>
 </main>
+
+<div id="quoteModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="quoteTitle">
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div>
+        <span class="demo-badge">DEMO – VERSTUURT NIET</span>
+        <h2 id="quoteTitle">Voorbeeld offerteaanvraag</h2>
+        <p>Vul testgegevens in om te bekijken wat later naar XXLGifts wordt gestuurd.</p>
+      </div>
+      <button id="closeQuote" class="icon-button" type="button" aria-label="Sluiten">×</button>
+    </div>
+
+    <div class="quote-grid">
+      <section class="quote-form">
+        <h3>Klantgegevens</h3>
+        <div class="field-grid">
+          <label>Naam
+            <input id="customerName" type="text" placeholder="Voornaam en achternaam">
+          </label>
+          <label>Bedrijf
+            <input id="customerCompany" type="text" placeholder="Bedrijfsnaam">
+          </label>
+          <label>E-mail
+            <input id="customerEmail" type="email" placeholder="naam@bedrijf.nl">
+          </label>
+          <label>Telefoon
+            <input id="customerPhone" type="tel" placeholder="+31 6 ...">
+          </label>
+          <label>Gewenste oplage
+            <input id="quoteQuantity" type="number" min="1" step="1" value="500">
+          </label>
+          <label>Gewenste leverdatum
+            <input id="quoteDeadline" type="date">
+          </label>
+        </div>
+        <label class="full-field">Opmerkingen
+          <textarea id="quoteNotes" rows="4" placeholder="Extra wensen of opmerkingen"></textarea>
+        </label>
+      </section>
+
+      <section class="quote-summary">
+        <h3>Wat wordt meegestuurd</h3>
+        <div id="summaryList" class="summary-list"></div>
+        <div class="attachment-list">
+          <b>Bestanden</b>
+          <span>mockup.png</span>
+          <span id="uploadSummary">Geüploade ontwerpen worden automatisch toegevoegd</span>
+        </div>
+      </section>
+    </div>
+
+    <div id="demoResult" class="demo-result hidden" aria-live="polite"></div>
+
+    <div class="modal-actions">
+      <button id="downloadRequestJson" class="secondary-action" type="button">Test-JSON downloaden</button>
+      <button id="prepareQuote" class="primary-action" type="button">Demo-aanvraag voorbereiden</button>
+    </div>
+    <p class="integration-note">Later vervangt Guus alleen de demo-functie door een POST-verzoek naar het offerte-endpoint.</p>
+  </div>
+</div>
+
 <script src="app.js"></script>
 </body>
 </html>

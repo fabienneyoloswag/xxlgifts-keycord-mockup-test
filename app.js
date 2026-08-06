@@ -20,9 +20,16 @@ const ui={
  loading:$('loading'),previewTitle:$('previewTitle'),stage:$('stage'),editPath:$('editPath'),
  editorControls:$('editorControls'),pathSelect:$('pathSelect'),undoPoint:$('undoPoint'),
  clearPath:$('clearPath'),savePath:$('savePath'),editorHint:$('editorHint'),
- modeBadge:$('modeBadge'),copyPath:$('copyPath'),saveTools:$('saveTools'),downloadTemplate:$('downloadTemplate')
+ modeBadge:$('modeBadge'),copyPath:$('copyPath'),
+ quoteModal:$('quoteModal'),modalBackdrop:$('modalBackdrop'),closeQuote:$('closeQuote'),
+ summaryList:$('summaryList'),uploadSummary:$('uploadSummary'),demoResult:$('demoResult'),
+ prepareQuote:$('prepareQuote'),downloadRequestJson:$('downloadRequestJson'),
+ customerName:$('customerName'),customerCompany:$('customerCompany'),
+ customerEmail:$('customerEmail'),customerPhone:$('customerPhone'),
+ quoteQuantity:$('quoteQuantity'),quoteDeadline:$('quoteDeadline'),quoteNotes:$('quoteNotes'),saveTools:$('saveTools'),downloadTemplate:$('downloadTemplate')
 };
 let config=null,currentTemplate=null,assets={},logo=null,frontDesign=null,backDesign=null,continuousDesign=null;
+let uploadedFiles={logo:null,front:null,back:null,continuous:null};
 let editing=false,dragging=null,sessionPaths=[];
 
 function loadImage(src){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Kon '+src+' niet laden'));im.src=src})}
@@ -174,10 +181,10 @@ function downloadJson(filename,data){
 }
 async function init(){const response=await fetch('templates.json',{cache:'no-store'});if(!response.ok)throw new Error('templates.json kon niet laden');config=await response.json();config.templates.forEach(t=>{const o=document.createElement('option');o.value=t.id;o.textContent=t.label;ui.template.appendChild(o)});await loadTemplate(config.templates[0].id)}
 ui.template.addEventListener('change',()=>loadTemplate(ui.template.value).catch(showError));
-ui.logoInput.addEventListener('change',()=>loadUploadedFile(ui.logoInput,ui.filename,im=>logo=im));
-ui.frontDesignInput.addEventListener('change',()=>loadUploadedFile(ui.frontDesignInput,ui.frontFilename,im=>frontDesign=im));
-ui.backDesignInput.addEventListener('change',()=>loadUploadedFile(ui.backDesignInput,ui.backFilename,im=>backDesign=im));
-ui.continuousDesignInput.addEventListener('change',()=>loadUploadedFile(ui.continuousDesignInput,ui.continuousFilename,im=>continuousDesign=im));
+ui.logoInput.addEventListener('change',()=>{uploadedFiles.logo=ui.logoInput.files?.[0]||null;loadUploadedFile(ui.logoInput,ui.filename,im=>logo=im)});
+ui.frontDesignInput.addEventListener('change',()=>{uploadedFiles.front=ui.frontDesignInput.files?.[0]||null;loadUploadedFile(ui.frontDesignInput,ui.frontFilename,im=>frontDesign=im)});
+ui.backDesignInput.addEventListener('change',()=>{uploadedFiles.back=ui.backDesignInput.files?.[0]||null;loadUploadedFile(ui.backDesignInput,ui.backFilename,im=>backDesign=im)});
+ui.continuousDesignInput.addEventListener('change',()=>{uploadedFiles.continuous=ui.continuousDesignInput.files?.[0]||null;loadUploadedFile(ui.continuousDesignInput,ui.continuousFilename,im=>continuousDesign=im)});
 ui.designMode.addEventListener('change',()=>{
  const mode=ui.designMode.value;
  ui.repeatUpload.classList.toggle('hidden',mode!=='repeat');
@@ -233,7 +240,123 @@ $('reset').addEventListener('click',()=>{
  ui.repeatContinuous.checked=false;ui.flipBackContinuous.checked=true;
  ui.hook.selectedIndex=0;sessionPaths=clonePaths(currentTemplate.paths);setEditing(false);render();
 });
-$('download').addEventListener('click',()=>{const wasEditing=editing;if(wasEditing)editing=false;render();const a=document.createElement('a');a.download=`xxlgifts-${currentTemplate.id}-mockup.png`;a.href=canvas.toDataURL('image/png');a.click();if(wasEditing){editing=true;render()}});
+function getSelectedHookLabel(){
+ return ui.hook.options[ui.hook.selectedIndex]?.textContent||ui.hook.value;
+}
+function getDesignModeLabel(){
+ return ui.designMode.options[ui.designMode.selectedIndex]?.textContent||ui.designMode.value;
+}
+function collectQuotePayload(){
+ return {
+  schemaVersion:'1.0',
+  status:'demo-not-sent',
+  customer:{
+   name:ui.customerName.value.trim(),
+   company:ui.customerCompany.value.trim(),
+   email:ui.customerEmail.value.trim(),
+   phone:ui.customerPhone.value.trim()
+  },
+  product:{
+   type:'keycord',
+   templateId:currentTemplate?.id||'',
+   templateLabel:currentTemplate?.label||'',
+   material:currentTemplate?.material||'',
+   width:currentTemplate?.width||20,
+   variant:currentTemplate?.variant||'normal',
+   color:ui.color.value.toUpperCase(),
+   hook:{id:ui.hook.value,label:getSelectedHookLabel()},
+   accessories:[]
+  },
+  design:{
+   mode:ui.designMode.value,
+   modeLabel:getDesignModeLabel(),
+   logoSize:Number(ui.size.value),
+   frontLogoCount:Number(ui.frontCount.value),
+   backLogoCount:Number(ui.backCount.value),
+   frontOffset:Number(ui.frontOffset.value),
+   backOffset:Number(ui.backOffset.value),
+   frontRotation:Number(ui.frontRotation.value),
+   backRotation:Number(ui.backRotation.value),
+   continuous:{
+    scale:Number(ui.continuousScale.value),
+    offset:Number(ui.continuousOffset.value),
+    repeat:ui.repeatContinuous.checked,
+    flipBack:ui.flipBackContinuous.checked
+   }
+  },
+  quote:{
+   quantity:Number(ui.quoteQuantity.value)||0,
+   requestedDeliveryDate:ui.quoteDeadline.value||null,
+   notes:ui.quoteNotes.value.trim()
+  },
+  files:{
+   mockup:'mockup.png',
+   logo:uploadedFiles.logo?.name||null,
+   frontDesign:uploadedFiles.front?.name||null,
+   backDesign:uploadedFiles.back?.name||null,
+   continuousDesign:uploadedFiles.continuous?.name||null
+  },
+  createdAt:new Date().toISOString()
+ };
+}
+function summaryRow(label,value){
+ return `<div class="summary-row"><span>${label}</span><b>${value||'—'}</b></div>`;
+}
+function updateQuoteSummary(){
+ const payload=collectQuotePayload();
+ ui.summaryList.innerHTML=[
+  summaryRow('Template',payload.product.templateLabel),
+  summaryRow('Materiaal',payload.product.material),
+  summaryRow('Breedte',payload.product.width+' mm'),
+  summaryRow('Kleur',payload.product.color),
+  summaryRow('Haak',payload.product.hook.label),
+  summaryRow('Bedrukking',payload.design.modeLabel),
+  summaryRow("Logo's voor",payload.design.frontLogoCount),
+  summaryRow("Logo's achter",payload.design.backLogoCount),
+  summaryRow('Oplage',payload.quote.quantity)
+ ].join('');
+ const names=Object.values(payload.files).filter(Boolean);
+ ui.uploadSummary.textContent=names.length>1?names.slice(1).join(', '):'Nog geen ontwerpbestand geüpload';
+}
+function openQuoteModal(){
+ updateQuoteSummary();
+ ui.demoResult.classList.add('hidden');
+ ui.quoteModal.classList.remove('hidden');
+ document.body.style.overflow='hidden';
+}
+function closeQuoteModal(){
+ ui.quoteModal.classList.add('hidden');
+ document.body.style.overflow='';
+}
+function downloadJson(filename,data){
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=filename;a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function canvasBlob(){
+ return await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+}
+async function prepareQuoteRequest(){
+ const payload=collectQuotePayload();
+ const mockupBlob=await canvasBlob();
+ const formData=new FormData();
+ formData.append('request',new Blob([JSON.stringify(payload)],{type:'application/json'}),'request.json');
+ if(mockupBlob)formData.append('mockup',mockupBlob,'mockup.png');
+ Object.entries(uploadedFiles).forEach(([key,file])=>{if(file)formData.append(key,file,file.name)});
+ console.group('XXLGifts demo-offerteaanvraag');
+ console.log('Payload',payload);
+ console.log('FormData-velden',[...formData.keys()]);
+ console.groupEnd();
+ ui.demoResult.innerHTML='<b>Demo gereed – niets verstuurd.</b><br>De aanvraag is alleen lokaal voorbereid en in de browserconsole getoond. Guus kan later dezelfde FormData naar <code>/api/quote-request</code> sturen.';
+ ui.demoResult.classList.remove('hidden');
+}
+$('download').addEventListener('click',openQuoteModal);
+ui.closeQuote.addEventListener('click',closeQuoteModal);
+ui.modalBackdrop.addEventListener('click',closeQuoteModal);
+ui.prepareQuote.addEventListener('click',prepareQuoteRequest);
+ui.downloadRequestJson.addEventListener('click',()=>downloadJson('xxlgifts-quote-request-demo.json',collectQuotePayload()));
+[ui.customerName,ui.customerCompany,ui.customerEmail,ui.customerPhone,ui.quoteQuantity,ui.quoteDeadline,ui.quoteNotes].forEach(el=>el.addEventListener('input',updateQuoteSummary));
 function showError(err){
  console.error(err);
  ui.loading.style.display='flex';
