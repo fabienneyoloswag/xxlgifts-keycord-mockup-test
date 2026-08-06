@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "templates": [
     {
       "id": "20mm-normal",
@@ -14,7 +14,8 @@
       "files": {
         "base": "20mm-normal-base.png",
         "colorMask": "20mm-normal-color-mask.png",
-        "designMask": "20mm-normal-design-mask.png",
+        "designFront": "20mm-normal-design-front.png",
+        "designBack": "20mm-normal-design-back.png",
         "overlay": "20mm-normal-overlay.png",
         "shadow": "20mm-normal-shadow.png"
       },
@@ -54,6 +55,8 @@
         {
           "id": "front",
           "label": "Voorste lint",
+          "mask": "designFront",
+          "rotationOffset": 0,
           "points": [
             [
               322,
@@ -97,6 +100,8 @@
         {
           "id": "back",
           "label": "Teruglopend lint",
+          "mask": "designBack",
+          "rotationOffset": 180,
           "points": [
             [
               898,

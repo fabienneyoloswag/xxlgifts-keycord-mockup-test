@@ -13,15 +13,15 @@
 <body>
 <header class="topbar">
   <div class="brandmark">XXL</div>
-  <div class="brandcopy"><strong>Mockup Studio</strong><span>Path Engine v4</span></div>
+  <div class="brandcopy"><strong>Mockup Studio</strong><span>Front/Back Engine v5</span></div>
   <div class="live"><i></i> Live</div>
 </header>
 
 <main class="workspace">
   <aside class="controls">
-    <p class="eyebrow">Padgestuurde bedrukking</p>
+    <p class="eyebrow">Echte voor- en achterkant</p>
     <h1>Keycord mockup</h1>
-    <p class="intro">Logo's worden gelijkmatig over opgeslagen middenlijnen verdeeld en draaien automatisch met ieder lintdeel mee.</p>
+    <p class="intro">Het teruglopende lint wordt eerst gerenderd en 180° gedraaid. Daarna komt het voorste lint erbovenop, zodat kruisingen correct verdwijnen.</p>
 
     <label class="title">1. Template</label>
     <select id="template"></select>
@@ -46,8 +46,11 @@
     <label class="range-label"><span>Logoformaat</span><b id="sizeValue">52%</b></label>
     <input id="size" type="range" min="25" max="95" value="52">
 
-    <label class="range-label"><span>Aantal logo's totaal</span><b id="countValue">12</b></label>
-    <input id="logoCount" type="range" min="3" max="20" value="12">
+    <label class="range-label"><span>Logo's voorste lint</span><b id="frontCountValue">7</b></label>
+    <input id="frontCount" type="range" min="1" max="14" value="7">
+
+    <label class="range-label"><span>Logo's teruglopend lint</span><b id="backCountValue">5</b></label>
+    <input id="backCount" type="range" min="1" max="12" value="5">
 
     <label class="range-label"><span>Startpositie verschuiven</span><b id="offsetValue">0%</b></label>
     <input id="offset" type="range" min="-45" max="45" value="0">
@@ -55,16 +58,8 @@
     <label class="range-label"><span>Extra rotatie</span><b id="rotationValue">0°</b></label>
     <input id="rotation" type="range" min="-15" max="15" value="0">
 
-    <label class="checkrow">
-      <input id="autoCount" type="checkbox" checked>
-      <span><b>Automatisch adviseren</b><small>Past het aantal aan op basis van logoformaat en padlengte.</small></span>
-    </label>
-
     <div class="editorbox">
-      <div>
-        <b>Templatepad</b>
-        <small>Alleen nodig bij het toevoegen of corrigeren van een mockup.</small>
-      </div>
+      <div><b>Templatepad</b><small>Alleen nodig om een lintlijn te corrigeren.</small></div>
       <button id="editPath" type="button">Pad bewerken</button>
     </div>
 
@@ -76,7 +71,7 @@
         <button id="clearPath" type="button">Pad leegmaken</button>
       </div>
       <button id="savePath" class="save-path" type="button">Pad gereed</button>
-      <p>Klik op de preview om punten te zetten. Sleep een bestaand punt om het te verplaatsen.</p>
+      <p>Klik in de preview om punten toe te voegen. Sleep een bestaand punt om het te verplaatsen.</p>
     </div>
 
     <div class="actions">
@@ -88,16 +83,20 @@
   <section class="preview">
     <div class="previewhead">
       <div><small>LIVE RESULTAAT</small><h2 id="previewTitle">Template laden…</h2></div>
-      <span id="modeBadge">ECHTE PSD-LAGEN</span>
+      <span id="modeBadge">FRONT + BACK</span>
     </div>
     <div id="stage" class="stage">
       <canvas id="canvas"></canvas>
-      <div id="empty"><b>Upload een logo</b><small>Kleur, haak en pad zijn al zichtbaar.</small></div>
+      <div id="empty"><b>Upload een logo</b><small>Kleur en haak zijn direct zichtbaar.</small></div>
       <div id="loading">Mockup laden…</div>
-      <div id="editorHint" class="editor-hint hidden">Klik over het midden van het lint · sleep punten om te corrigeren</div>
+      <div id="editorHint" class="editor-hint hidden">Klik over het midden van het lint · sleep om te corrigeren</div>
     </div>
-    <div class="note"><b>Pad-editor:</b> de aangepaste punten blijven tijdens deze sessie actief. De knop <b>Padgegevens kopiëren</b> maakt JSON dat later in <code>templates.json</code> kan worden gezet.</div>
-    <button id="copyPath" class="copy-path hidden" type="button">Padgegevens kopiëren</button>
+    <div class="note"><b>Opslaan op alle apparaten:</b> bewerk het pad, klik op <b>Pad gereed</b> en download daarna een nieuw <code>templates.json</code>. Vervang alleen dat bestand in GitHub.</div>
+    <div id="saveTools" class="save-tools hidden">
+      <button id="downloadTemplate" class="download-template" type="button">Templatebestand downloaden</button>
+      <button id="copyPath" class="copy-path" type="button">Alleen padgegevens kopiëren</button>
+      <small>Upload daarna het gedownloade <code>templates.json</code> in GitHub en vervang het bestaande bestand.</small>
+    </div>
   </section>
 </main>
 <script src="app.js"></script>
