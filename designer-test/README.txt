@@ -49,3 +49,12 @@ V4 feedbackronde:
 - eigen huisstijlfont duidelijk als productie-opmerking
 - rotatie: slider + exact getal + presets 0/45/90/180 + magnetische snap binnen 3 graden
 - SVG brononderdelen selecteren en groeperen met eigen groepsnaam
+
+V5 groepslogica:
+- Brononderdelen en Mijn groepen duidelijk gescheiden
+- brononderdelen worden niet meer automatisch in het ontwerp gezet
+- groep mag uit 1 onderdeel bestaan (dus woordmerk kan eigen groep zijn)
+- eigen groepen hebben Gebruik / Hernoemen / Verwijderen
+- per groep uitlijning Boven / Midden / Onder
+- Alles op middenlijn voor één klik uitlijnen
+- Complete logo blijft veilige intacte fallback

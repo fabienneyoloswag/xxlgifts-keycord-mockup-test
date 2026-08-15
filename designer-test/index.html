@@ -22,7 +22,7 @@ input,select,textarea,button{font:inherit;width:100%;padding:11px 12px;border:1p
 input[type=color]{padding:2px;height:42px}input[type=range]{padding:0}
 button{cursor:pointer;font-weight:700}.primary{background:#e1322d;color:#fff;border-color:#e1322d}.primary:hover{background:#c92723}.secondary{background:#151515;color:#fff;border-color:#151515}
 .logo-list{display:grid;gap:8px}.logo-item{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:8px;background:#f5f5f5;padding:7px;border-radius:9px}.logo-item img{width:32px;height:32px;object-fit:contain}.part-check{width:auto}.part-selected{outline:2px solid #e1322d}
-.small{font-size:12px;color:#666}.status{padding:10px;background:#fff4d8;border-radius:9px;font-size:12px}
+.small{font-size:12px;color:#666}.mini-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:7px}.group-card{border:1px solid #e3e3e3;background:#fafafa;padding:9px;border-radius:10px}.align-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}.status{padding:10px;background:#fff4d8;border-radius:9px;font-size:12px}
 @media(max-width:900px){main{grid-template-columns:1fr}.mock{height:48vh}.controls{order:2}}
 </style>
 </head>
@@ -75,6 +75,10 @@ button{cursor:pointer;font-weight:700}.primary{background:#e1322d;color:#fff;bor
  </div>
  <div class="section">
   <label>Patroon / volgorde</label>
+<div class="row" style="margin-bottom:8px">
+  <button type="button" id="centerAllObjects">Alles op middenlijn</button>
+  <button type="button" id="clearDesignObjects">Ontwerp leegmaken</button>
+</div>
   <input id="pattern" value="A" placeholder="Bijv. A-B-A-B of A-A-B">
   <label style="margin-top:10px">Aantal plaatsingen <span id="countVal">7</span></label><input id="count" type="range" min="1" max="20" value="7">
   <label>Randmarge <span id="marginVal">6</span>%</label><input id="margin" type="range" min="0" max="25" value="6">
@@ -108,7 +112,7 @@ button{cursor:pointer;font-weight:700}.primary{background:#e1322d;color:#fff;bor
 </main>
 <script>
 const $=s=>document.querySelector(s), strip=$('#strip');
-let logos=[], texts=[], latestSvgParts=null;
+let logos=[], texts=[], latestSvgParts=null, svgGroups=[];
 function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function renderList(){ $('#logoList').innerHTML=logos.map((l,i)=>`<div class="logo-item"><img src="${l.url}"><span>${String.fromCharCode(65+i)} · ${esc(l.name)}</span><button onclick="removeLogo(${i})" style="width:auto;padding:5px 8px">×</button></div>`).join(''); }
 window.removeLogo=i=>{URL.revokeObjectURL(logos[i].url);logos.splice(i,1);renderList();render()}
@@ -128,7 +132,10 @@ function render(){
    const li=seq[i%seq.length] ?? 0, l=logos[li]; if(!l) continue;
    const x=count===1?50:m+(100-2*m)*(i/(count-1));
    const img=document.createElement('img'); img.src=l.url; img.className='obj';
-   img.style.left=x+'%'; img.style.top=`calc(50% + ${y}px)`; img.style.transform=`translate(-50%,-50%) rotate(${rot}deg)`;
+   img.style.left=x+'%';
+   const alignOffset = l.align==='top' ? -18 : (l.align==='bottom' ? 18 : 0);
+   img.style.top=`calc(50% + ${y + alignOffset}px)`;
+   img.style.transform=`translate(-50%,-50%) rotate(${rot}deg)`;
    strip.appendChild(img);
   }
  }
@@ -150,6 +157,59 @@ function svgElToUrl(svgRoot, nodes, vb){
   nodes.forEach(n=>clone.appendChild(n.cloneNode(true)));
   return URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(clone)],{type:'image/svg+xml'}));
 }
+
+function renderGroups(){
+  const box=$('#myGroups');
+  if(!box) return;
+  if(!svgGroups.length){
+    box.innerHTML='<div class="small" id="noGroups">Nog geen groepen gemaakt.</div>';
+    return;
+  }
+  box.innerHTML=svgGroups.map((g,i)=>`
+    <div class="group-card" data-group-card="${i}">
+      <div class="logo-item" style="padding:0;background:transparent">
+        <img src="${g.url}">
+        <span><strong>${esc(g.name)}</strong><br><span class="small">${g.partIds.length} brononderde${g.partIds.length===1?'el':'len'}</span></span>
+        <button type="button" style="width:auto" data-use-group="${i}">Gebruik</button>
+      </div>
+      <div class="align-row">
+        <button type="button" data-align="${i}:top">Boven</button>
+        <button type="button" data-align="${i}:middle">Midden</button>
+        <button type="button" data-align="${i}:bottom">Onder</button>
+      </div>
+      <div class="row" style="margin-top:7px">
+        <button type="button" data-rename-group="${i}">Hernoemen</button>
+        <button type="button" data-delete-group="${i}">Verwijderen</button>
+      </div>
+    </div>`).join('');
+
+  [...box.querySelectorAll('[data-use-group]')].forEach(b=>b.onclick=()=>{
+    const g=svgGroups[+b.dataset.useGroup];
+    logos.push({name:g.name,url:g.url,groupId:g.id,align:g.align||'middle'});
+    renderList(); render();
+  });
+  [...box.querySelectorAll('[data-align]')].forEach(b=>b.onclick=()=>{
+    const [i,mode]=b.dataset.align.split(':');
+    svgGroups[+i].align=mode;
+    renderGroups();
+    // Update any already-used instances of this group
+    logos.forEach(l=>{if(l.groupId===svgGroups[+i].id) l.align=mode});
+    render();
+  });
+  [...box.querySelectorAll('[data-rename-group]')].forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.renameGroup;
+    const n=prompt('Nieuwe groepsnaam',svgGroups[i].name);
+    if(n && n.trim()){svgGroups[i].name=n.trim();renderGroups();renderList();}
+  });
+  [...box.querySelectorAll('[data-delete-group]')].forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.deleteGroup;
+    const id=svgGroups[i].id;
+    svgGroups.splice(i,1);
+    logos=logos.filter(l=>l.groupId!==id);
+    renderGroups();renderList();render();
+  });
+}
+
 async function analyseSvg(file){
   const txt=await file.text(), doc=new DOMParser().parseFromString(txt,'image/svg+xml');
   if(doc.querySelector('parsererror')) return null;
@@ -166,18 +226,18 @@ async function addUploadedFile(f){
       const complete=URL.createObjectURL(f);
       const parts=a.candidates.map((c,i)=>({name:`Onderdeel ${String.fromCharCode(65+i)}`,url:svgElToUrl(a.svg,[c.node],a.vb),node:c.node,svg:a.svg,vb:a.vb})); latestSvgParts=parts;
       $('#svgAnalysis').style.display='block';
-      $('#svgAnalysis').innerHTML=`<strong>SVG geanalyseerd:</strong> ${parts.length} brononderdelen gevonden. We splitsen alleen op groepen/paden die al in het originele SVG-bestand bestaan — nooit midden in letters of vormen.`;
+      $('#svgAnalysis').innerHTML=`<strong>SVG geanalyseerd:</strong> ${parts.length} brononderdelen gevonden. Maak hieruit zelf één of meer groepen, bijvoorbeeld Beeldmerk en Woordmerk. We wijzigen nooit interne letters of vormen.`;
       $('#partsPanel').style.display='block';
       $('#partsList').innerHTML=
         `<div class="logo-item"><span style="font-weight:800">✓</span><span>Compleet logo · altijd veilig</span><button type="button" style="width:auto" id="useComplete">Gebruik</button></div>`+
-        parts.map((p,i)=>`<div class="logo-item" data-part-row="${i}"><input class="part-check" type="checkbox" data-check="${i}"><img src="${p.url}"><span>${p.name}</span><button type="button" style="width:auto" data-part="${i}">Gebruik</button></div>`).join('');
-      $('#useComplete').onclick=()=>{logos=[{name:f.name,url:complete}];renderList();render()};
+        parts.map((p,i)=>`<div class="logo-item" data-part-row="${i}"><input class="part-check" type="checkbox" data-check="${i}"><img src="${p.url}"><span>${p.name}<br><span class="small">Brononderdeel</span></span><button type="button" style="width:auto" data-part="${i}">Los gebruiken</button></div>`).join('');
+      $('#useComplete').onclick=()=>{logos=[{name:'Compleet logo',url:complete,align:'middle'}];renderList();render()};
       [...$('#partsList').querySelectorAll('[data-part]')].forEach(b=>b.onclick=()=>{
         const p=parts[+b.dataset.part]; logos.push({name:p.name,url:p.url});renderList();render()
       });
       // Auto proposal: use all exposed source parts separately, but do NOT pretend semantic certainty.
-      logos=parts.map(p=>({name:p.name,url:p.url}));
-      renderList(); render();
+      logos=[]; svgGroups=[];
+      renderList(); renderGroups(); render();
       return;
     }
   }
@@ -229,14 +289,22 @@ document.querySelectorAll('.rotPreset').forEach(b=>b.onclick=()=>{$('#rot').valu
 $('#groupParts').onclick=()=>{
  if(!latestSvgParts) return;
  const ids=[...document.querySelectorAll('[data-check]:checked')].map(c=>+c.dataset.check);
- if(ids.length<2){alert('Selecteer minimaal 2 SVG-onderdelen om te groeperen.');return}
+ if(ids.length<1){alert('Selecteer minimaal 1 SVG-onderdeel om een groep te maken.');return}
  const p0=latestSvgParts[ids[0]];
  const nodes=ids.map(i=>latestSvgParts[i].node);
- const name=$('#groupName').value.trim()||'Groep';
+ const name=$('#groupName').value.trim()||`Groep ${svgGroups.length+1}`;
  const url=svgElToUrl(p0.svg,nodes,p0.vb);
- logos.push({name,url}); renderList(); render();
+ svgGroups.push({
+   id:'g'+Date.now()+Math.random().toString(36).slice(2),
+   name, url, partIds:ids, align:'middle'
+ });
+ $('#groupName').value='';
+ document.querySelectorAll('[data-check]').forEach(c=>c.checked=false);
+ renderGroups();
 };
 $('#clearParts').onclick=()=>document.querySelectorAll('[data-check]').forEach(c=>c.checked=false);
+$('#centerAllObjects').onclick=()=>{logos.forEach(l=>l.align='middle');svgGroups.forEach(g=>g.align='middle');$('#y').value=0;renderGroups();render();};
+$('#clearDesignObjects').onclick=()=>{logos=[];texts=[];renderList();render();};
 
 render();
 </script>
