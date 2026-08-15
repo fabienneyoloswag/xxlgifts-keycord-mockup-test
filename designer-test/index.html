@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XXLGifts Keycord Designer Test</title>
+<style>
+:root{font-family:Montserrat,Arial,sans-serif;color:#171717;background:#f3f3f3}
+*{box-sizing:border-box} body{margin:0}.top{background:#fff;padding:16px 24px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:12px;background:#ffe6e6;color:#b40000;padding:6px 9px;border-radius:999px;font-weight:700}
+main{max-width:1500px;margin:auto;padding:20px;display:grid;grid-template-columns:minmax(0,1.8fr) minmax(330px,.8fr);gap:18px}
+.card{background:#fff;border-radius:18px;padding:18px;box-shadow:0 2px 12px #0000000c}.card h2{margin:0 0 12px}
+.mock{height:min(58vh,650px);border-radius:14px;background:#eee;display:grid;place-items:center;overflow:hidden;position:relative}
+.mock img{width:100%;height:100%;object-fit:contain}.mock .placeholder{text-align:center;color:#777}
+.editor{margin-top:18px}.stripwrap{overflow:auto;padding:16px 0}.strip{position:relative;height:130px;min-width:1100px;background:#e51b23;border:1px solid #bbb;overflow:hidden}
+.obj{position:absolute;top:50%;transform:translate(-50%,-50%);max-height:76%;max-width:180px;user-select:none}.obj.text{font-weight:700;color:white;white-space:nowrap;font-size:28px}
+.guide{position:absolute;left:0;right:0;top:50%;border-top:1px dashed #ffffff88;pointer-events:none}
+.controls{display:grid;gap:14px}.section{border-top:1px solid #eee;padding-top:14px}.section:first-child{border:0;padding-top:0}
+label{display:block;font-size:12px;font-weight:700;margin-bottom:5px}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+input,select,textarea,button{font:inherit;width:100%;padding:10px;border:1px solid #ccc;border-radius:9px;background:white}
+input[type=color]{padding:2px;height:42px}input[type=range]{padding:0}
+button{cursor:pointer;font-weight:700}.primary{background:#e30613;color:#fff;border-color:#e30613}.secondary{background:#111;color:#fff;border-color:#111}
+.logo-list{display:grid;gap:8px}.logo-item{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:8px;background:#f5f5f5;padding:7px;border-radius:9px}.logo-item img{width:32px;height:32px;object-fit:contain}
+.small{font-size:12px;color:#666}.status{padding:10px;background:#fff4d8;border-radius:9px;font-size:12px}
+@media(max-width:900px){main{grid-template-columns:1fr}.mock{height:48vh}.controls{order:2}}
+</style>
+</head>
+<body>
+<div class="top"><strong>XXLGifts · Keycord Designer</strong><span class="badge">DESIGNER TEST · geen invloed op main</span></div>
+<main>
+<section>
+ <div class="card">
+  <h2>Realistische mockup</h2>
+  <div class="mock" id="mock"><div class="placeholder"><strong>Mockup preview</strong><br><span class="small">Adobe Smart Object-render wordt later hier gekoppeld.</span></div></div>
+  <button class="primary" id="refreshMock" style="margin-top:12px">Mockup vernieuwen</button>
+ </div>
+ <div class="card editor">
+  <h2>Productielijn</h2>
+  <div class="small">Live ontwerpvlak. De echte Illustrator-maten/artboards kunnen na Adobe-validatie exact worden ingevuld.</div>
+  <div class="stripwrap"><div class="strip" id="strip"><div class="guide"></div></div></div>
+  <div class="row">
+   <button class="secondary" id="downloadSvg">Productielijn SVG downloaden</button>
+   <button id="reset">Reset verdeling</button>
+  </div>
+ </div>
+</section>
+<aside class="card controls">
+ <div class="section">
+  <label>Variant</label>
+  <select id="variant"><option value="normal">Normaal</option><option value="safety">Safety</option><option value="buckle">Buckle</option><option value="buckleSafety">Buckle + Safety</option></select>
+  <div class="status" id="variantInfo">Normaal: één doorlopende productielijn.</div>
+ </div>
+ <div class="section">
+  <label>Lintkleur</label><input type="color" id="bg" value="#e51b23">
+ </div>
+ <div class="section">
+  <label>Logo's toevoegen (meerdere mogelijk)</label><input id="logoInput" type="file" accept="image/*,.svg" multiple>
+  <div class="logo-list" id="logoList"></div>
+ </div>
+ <div class="section">
+  <label>Patroon / volgorde</label>
+  <input id="pattern" value="A" placeholder="Bijv. A-B-A-B of A-A-B">
+  <label style="margin-top:10px">Aantal plaatsingen <span id="countVal">7</span></label><input id="count" type="range" min="1" max="20" value="7">
+  <label>Randmarge <span id="marginVal">6</span>%</label><input id="margin" type="range" min="0" max="25" value="6">
+  <label>Verticale positie <span id="yVal">0</span></label><input id="y" type="range" min="-45" max="45" value="0">
+  <label>Rotatie gehele patroon <span id="rotVal">0</span>°</label><input id="rot" type="range" min="-180" max="180" value="0">
+ </div>
+ <div class="section">
+  <label>Tekst toevoegen</label><input id="text" placeholder="Bijv. www.xxlgifts.com">
+  <div class="row"><input id="textSize" type="number" value="28" min="8" max="80"><button id="addText">Tekst toevoegen</button></div>
+  <label style="margin-top:10px">Eigen lettertype / fontnaam</label><input id="fontNote" placeholder="Bijv. Gotham Bold">
+ </div>
+ <div class="section">
+  <label>Complete lijntekening uploaden</label><input id="fullArtwork" type="file" accept="image/*,.svg">
+  <div class="small">Voor artwork dat al volledig is opgemaakt.</div>
+ </div>
+ <div class="section">
+  <label>Overige opmerkingen</label><textarea id="notes" rows="4" placeholder="Bijv. logo iets hoger, PMS 186 C, tekst exact volgens huisstijl..."></textarea>
+ </div>
+</aside>
+</main>
+<script>
+const $=s=>document.querySelector(s), strip=$('#strip');
+let logos=[], texts=[];
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderList(){ $('#logoList').innerHTML=logos.map((l,i)=>`<div class="logo-item"><img src="${l.url}"><span>${String.fromCharCode(65+i)} · ${esc(l.name)}</span><button onclick="removeLogo(${i})" style="width:auto;padding:5px 8px">×</button></div>`).join(''); }
+window.removeLogo=i=>{URL.revokeObjectURL(logos[i].url);logos.splice(i,1);renderList();render()}
+function sequence(){
+ const raw=$('#pattern').value.toUpperCase().split(/[^A-Z]+/).filter(Boolean);
+ const idx=raw.map(x=>x.charCodeAt(0)-65).filter(i=>logos[i]);
+ return idx.length?idx:[0];
+}
+function render(){
+ strip.style.background=$('#bg').value;
+ [...strip.querySelectorAll('.obj,.full')].forEach(n=>n.remove());
+ const count=+$('input#count').value, m=+$('input#margin').value, y=+$('input#y').value, rot=+$('input#rot').value;
+ $('#countVal').textContent=count;$('#marginVal').textContent=m;$('#yVal').textContent=y;$('#rotVal').textContent=rot;
+ const seq=sequence();
+ if(logos.length){
+  for(let i=0;i<count;i++){
+   const li=seq[i%seq.length] ?? 0, l=logos[li]; if(!l) continue;
+   const x=count===1?50:m+(100-2*m)*(i/(count-1));
+   const img=document.createElement('img'); img.src=l.url; img.className='obj';
+   img.style.left=x+'%'; img.style.top=`calc(50% + ${y}px)`; img.style.transform=`translate(-50%,-50%) rotate(${rot}deg)`;
+   strip.appendChild(img);
+  }
+ }
+ texts.forEach(t=>{const d=document.createElement('div');d.className='obj text';d.textContent=t.text;d.style.left=t.x+'%';d.style.fontSize=t.size+'px';strip.appendChild(d)})
+}
+$('#logoInput').onchange=e=>{[...e.target.files].forEach(f=>logos.push({name:f.name,url:URL.createObjectURL(f)}));renderList();render()}
+['bg','pattern','count','margin','y','rot'].forEach(id=>$('#'+id).addEventListener('input',render));
+$('#addText').onclick=()=>{if($('#text').value.trim()){texts.push({text:$('#text').value.trim(),size:+$('#textSize').value||28,x:50});$('#text').value='';render()}}
+$('#reset').onclick=()=>{$('#count').value=7;$('#margin').value=6;$('#y').value=0;$('#rot').value=0;render()}
+$('#variant').onchange=e=>{
+ const v=e.target.value, info=$('#variantInfo');
+ info.textContent={normal:'Normaal: één doorlopende productielijn.',safety:'Safety: links/rechts productielogica; rechter artworkzijde wordt in productie 180° verwerkt voor doorloop.',buckle:'Buckle: gebruikt straks het langere buckle-artboard uit de Illustrator-template.',buckleSafety:'Buckle + Safety: langer buckle-artboard + links/rechts safety-logica.'}[v];
+}
+$('#fullArtwork').onchange=e=>{const f=e.target.files[0];if(!f)return;const img=document.createElement('img');img.className='full';img.src=URL.createObjectURL(f);Object.assign(img.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'fill'});strip.appendChild(img)}
+$('#refreshMock').onclick=()=>alert('Adobe Smart Object-render is in deze test nog niet gekoppeld. De editor/output werkt wel zelfstandig.');
+$('#downloadSvg').onclick=()=>{
+ const w=1400,h=160,bg=$('#bg').value,count=+$('#count').value,m=+$('#margin').value,y=+$('#y').value,rot=+$('#rot').value,seq=sequence();
+ let body=`<rect width="100%" height="100%" fill="${bg}"/>`;
+ if(logos.length){
+   alert('SVG-export van geüploade raster/logo-bestanden wordt in v2 als data-URL ingebed. Voor deze eerste test kun je de live lijn en instellingen beoordelen.');
+ }
+ body+=texts.map(t=>`<text x="${t.x/100*w}" y="${h/2}" text-anchor="middle" dominant-baseline="middle" font-family="Arial" font-size="${t.size}" fill="white">${esc(t.text)}</text>`).join('');
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${body}</svg>`;
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));a.download='keycord-productielijn-test.svg';a.click();
+}
+render();
+</script>
+</body></html>
