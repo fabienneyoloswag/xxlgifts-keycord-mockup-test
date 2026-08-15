@@ -7,7 +7,7 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
 :root{font-family:'Montserrat',Arial,sans-serif;color:#171717;background:#f4f4f4}
-*{box-sizing:border-box} body{margin:0}.top{background:#fff;padding:13px 24px;border-bottom:1px solid #e7e7e7;display:flex;justify-content:space-between;align-items:center;gap:16px;position:sticky;top:0;z-index:20}.brand{display:flex;align-items:center;gap:12px}.brand img{width:48px;height:48px;object-fit:contain;border-radius:10px;background:#fff}.brand-title{font-weight:800;font-size:15px}.brand-sub{font-size:11px;color:#777;margin-top:2px;font-weight:600}
+*{box-sizing:border-box} body{margin:0}.top{background:#fff;padding:13px 24px;border-bottom:1px solid #e7e7e7;display:flex;justify-content:space-between;align-items:center;gap:16px;position:sticky;top:0;z-index:20}.brand{display:flex;align-items:center;gap:12px}.brand img{width:76px;height:48px;object-fit:contain;object-position:left center;border-radius:0;background:transparent;display:block}.brand-title{font-weight:800;font-size:15px}.brand-sub{font-size:11px;color:#777;margin-top:2px;font-weight:600}
 .badge{font-size:11px;background:#fff0f0;color:#d92c27;padding:7px 10px;border-radius:999px;font-weight:800;white-space:nowrap}
 main{max-width:1500px;margin:auto;padding:20px;display:grid;grid-template-columns:minmax(0,1.8fr) minmax(330px,.8fr);gap:18px}
 .card{background:#fff;border-radius:18px;padding:18px;box-shadow:0 2px 12px #0000000c}.card h2{margin:0 0 12px}
@@ -29,7 +29,7 @@ button{cursor:pointer;font-weight:700}.primary{background:#e1322d;color:#fff;bor
 <body>
 <div class="top">
       <div class="brand">
-        <img src="assets/xxlgifts-square-logo.png" alt="XXLGifts">
+        <img src="assets/xxlgifts-square-logo.png" alt="XXLGifts logo">
         <div><div class="brand-title">Keycord Designer</div><div class="brand-sub">Powered by XXLGifts</div></div>
       </div>
       <span class="badge">DESIGNER TEST · geen invloed op main</span>
@@ -76,14 +76,18 @@ button{cursor:pointer;font-weight:700}.primary{background:#e1322d;color:#fff;bor
     <input id="groupName" placeholder="Naam groep, bijv. Beeldmerk" style="margin-top:8px">
 
     <div id="groupsSection" style="margin-top:16px">
-      <div class="mini-head"><strong>Mijn groepen</strong><span class="small">deze gebruik je in je ontwerp</span></div>
+      <div class="mini-head"><strong>Mijn groepen</strong><span class="small">selecteer meerdere voor A-B-A-B</span></div>
       <div id="myGroups" class="logo-list">
         <div class="small">Nog geen groepen gemaakt.</div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button type="button" id="useSelectedGroups">Gebruik geselecteerde groepen</button>
+        <button type="button" id="clearSelectedGroups">Groepsselectie wissen</button>
       </div>
     </div>
 
     <div class="small" style="margin-top:8px">
-      Brononderdelen blijven alleen ter controle zichtbaar. Gebruik daarna bij voorkeur je eigen groepen of het Complete logo.
+      Brononderdelen zijn alleen bouwstenen. Maak groepen zoals Beeldmerk en Woordmerk, selecteer die onder Mijn groepen en klik daarna op ‘Gebruik geselecteerde groepen’.
     </div>
   </div>
  </div>
@@ -181,10 +185,11 @@ function renderGroups(){
   }
   box.innerHTML=svgGroups.map((g,i)=>`
     <div class="group-card" data-group-card="${i}">
-      <div class="logo-item" style="padding:0;background:transparent">
+      <div class="logo-item" style="padding:0;background:transparent;grid-template-columns:24px 32px 1fr auto">
+        <input class="part-check" type="checkbox" data-group-check="${i}" ${g.selected?'checked':''}>
         <img src="${g.url}">
         <span><strong>${esc(g.name)}</strong><br><span class="small">${g.partIds.length} brononderde${g.partIds.length===1?'el':'len'}</span></span>
-        <button type="button" style="width:auto" data-use-group="${i}">Gebruik</button>
+        <button type="button" style="width:auto" data-use-group="${i}">Los gebruiken</button>
       </div>
       <div class="align-row">
         <button type="button" data-align="${i}:top">Boven</button>
@@ -201,6 +206,9 @@ function renderGroups(){
     const g=svgGroups[+b.dataset.useGroup];
     logos.push({name:g.name,url:g.url,groupId:g.id,align:g.align||'middle'});
     renderList(); render();
+  });
+  [...box.querySelectorAll('[data-group-check]')].forEach(c=>c.onchange=()=>{
+    svgGroups[+c.dataset.groupCheck].selected=c.checked;
   });
   [...box.querySelectorAll('[data-align]')].forEach(b=>b.onclick=()=>{
     const [i,mode]=b.dataset.align.split(':');
@@ -319,6 +327,18 @@ $('#groupParts').onclick=()=>{
  if(section) section.scrollIntoView({behavior:'smooth',block:'nearest'});
 };
 $('#clearParts').onclick=()=>document.querySelectorAll('[data-check]').forEach(c=>c.checked=false);
+$('#useSelectedGroups').onclick=()=>{
+  const selected=svgGroups.filter(g=>g.selected);
+  if(!selected.length){alert('Selecteer eerst één of meer groepen bij Mijn groepen.');return}
+  logos=selected.map(g=>({name:g.name,url:g.url,groupId:g.id,align:'middle'}));
+  // Pattern letters follow the selected group order: A-B-C...
+  $('#pattern').value=logos.map((_,i)=>String.fromCharCode(65+i)).join('-');
+  renderList(); render();
+};
+$('#clearSelectedGroups').onclick=()=>{
+  svgGroups.forEach(g=>g.selected=false);
+  renderGroups();
+};
 $('#centerAllObjects').onclick=()=>{logos.forEach(l=>l.align='middle');svgGroups.forEach(g=>g.align='middle');$('#y').value=0;renderGroups();render();};
 $('#clearDesignObjects').onclick=()=>{logos=[];texts=[];renderList();render();};
 

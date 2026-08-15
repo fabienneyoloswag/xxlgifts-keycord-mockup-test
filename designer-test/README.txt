@@ -64,3 +64,10 @@ V6 hotfix:
 - gemaakte groepen verschijnen direct onder Brononderdelen
 - na groeperen scrollt de sidebar automatisch naar Mijn groepen
 - brononderdelen vs gemaakte groepen duidelijker benoemd
+
+V7 fixes:
+- headerlogo niet meer vierkant gecropt; volledige artwork-verhouding zichtbaar
+- Mijn groepen heeft selectievakjes
+- meerdere groepen tegelijk gebruiken via 'Gebruik geselecteerde groepen'
+- geselecteerde groepen worden automatisch patroon A-B-C... en midden uitgelijnd
+- losse 'Gebruik' heet nu 'Los gebruiken' om verwarring te voorkomen
