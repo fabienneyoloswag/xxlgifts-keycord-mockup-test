@@ -58,3 +58,9 @@ V5 groepslogica:
 - per groep uitlijning Boven / Midden / Onder
 - Alles op middenlijn voor één klik uitlijnen
 - Complete logo blijft veilige intacte fallback
+
+V6 hotfix:
+- zichtbaar blok 'Mijn groepen' toegevoegd
+- gemaakte groepen verschijnen direct onder Brononderdelen
+- na groeperen scrollt de sidebar automatisch naar Mijn groepen
+- brononderdelen vs gemaakte groepen duidelijker benoemd

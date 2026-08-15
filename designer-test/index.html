@@ -66,11 +66,25 @@ button{cursor:pointer;font-weight:700}.primary{background:#e1322d;color:#fff;bor
   <div class="logo-list" id="logoList"></div>
   <div id="svgAnalysis" class="status" style="display:none;margin-top:9px"></div>
   <div id="partsPanel" style="display:none;margin-top:9px">
-    <label>Herkende SVG-onderdelen</label>
+    <div class="mini-head"><strong>Brononderdelen</strong><span class="small">uit het originele SVG</span></div>
     <div id="partsList" class="logo-list"></div>
-<div class="row" style="margin-top:8px"><button type="button" id="groupParts">Selectie groeperen</button><button type="button" id="clearParts">Selectie wissen</button></div>
-<input id="groupName" placeholder="Naam groep, bijv. Beeldmerk" style="margin-top:8px">
-    <div class="small" style="margin-top:6px">Automatisch voorstel; jij kunt altijd Compleet logo kiezen als de splitsing niet klopt.</div>
+
+    <div class="row" style="margin-top:8px">
+      <button type="button" id="groupParts">Maak groep van selectie</button>
+      <button type="button" id="clearParts">Selectie wissen</button>
+    </div>
+    <input id="groupName" placeholder="Naam groep, bijv. Beeldmerk" style="margin-top:8px">
+
+    <div id="groupsSection" style="margin-top:16px">
+      <div class="mini-head"><strong>Mijn groepen</strong><span class="small">deze gebruik je in je ontwerp</span></div>
+      <div id="myGroups" class="logo-list">
+        <div class="small">Nog geen groepen gemaakt.</div>
+      </div>
+    </div>
+
+    <div class="small" style="margin-top:8px">
+      Brononderdelen blijven alleen ter controle zichtbaar. Gebruik daarna bij voorkeur je eigen groepen of het Complete logo.
+    </div>
   </div>
  </div>
  <div class="section">
@@ -230,7 +244,7 @@ async function addUploadedFile(f){
       $('#partsPanel').style.display='block';
       $('#partsList').innerHTML=
         `<div class="logo-item"><span style="font-weight:800">✓</span><span>Compleet logo · altijd veilig</span><button type="button" style="width:auto" id="useComplete">Gebruik</button></div>`+
-        parts.map((p,i)=>`<div class="logo-item" data-part-row="${i}"><input class="part-check" type="checkbox" data-check="${i}"><img src="${p.url}"><span>${p.name}<br><span class="small">Brononderdeel</span></span><button type="button" style="width:auto" data-part="${i}">Los gebruiken</button></div>`).join('');
+        parts.map((p,i)=>`<div class="logo-item" data-part-row="${i}"><input class="part-check" type="checkbox" data-check="${i}"><img src="${p.url}"><span>${p.name}<br><span class="small">Brononderdeel</span></span><button type="button" style="width:auto" data-part="${i}">Bron los gebruiken</button></div>`).join('');
       $('#useComplete').onclick=()=>{logos=[{name:'Compleet logo',url:complete,align:'middle'}];renderList();render()};
       [...$('#partsList').querySelectorAll('[data-part]')].forEach(b=>b.onclick=()=>{
         const p=parts[+b.dataset.part]; logos.push({name:p.name,url:p.url});renderList();render()
@@ -301,6 +315,8 @@ $('#groupParts').onclick=()=>{
  $('#groupName').value='';
  document.querySelectorAll('[data-check]').forEach(c=>c.checked=false);
  renderGroups();
+ const section=$('#groupsSection');
+ if(section) section.scrollIntoView({behavior:'smooth',block:'nearest'});
 };
 $('#clearParts').onclick=()=>document.querySelectorAll('[data-check]').forEach(c=>c.checked=false);
 $('#centerAllObjects').onclick=()=>{logos.forEach(l=>l.align='middle');svgGroups.forEach(g=>g.align='middle');$('#y').value=0;renderGroups();render();};
