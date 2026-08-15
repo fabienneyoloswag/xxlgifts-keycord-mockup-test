@@ -13,7 +13,7 @@ main{max-width:1500px;margin:auto;padding:20px;display:grid;grid-template-column
 .card{background:#fff;border-radius:18px;padding:18px;box-shadow:0 2px 12px #0000000c}.card h2{margin:0 0 12px}
 .mock{height:min(58vh,650px);border-radius:14px;background:#eee;display:grid;place-items:center;overflow:hidden;position:relative}
 .mock img{width:100%;height:100%;object-fit:contain}.mock .placeholder{text-align:center;color:#777}
-.editor{margin-top:18px}.stripwrap{overflow:auto;padding:16px 0}.strip{position:relative;height:130px;min-width:1100px;background:#e1322d;border:1px solid #bbb;overflow:hidden}
+.editor{margin-top:18px}.stripwrap{overflow:hidden;padding:16px 0}.strip{position:relative;height:130px;width:100%;min-width:0;background:#e1322d;border:1px solid #bbb;overflow:hidden}
 .obj{position:absolute;top:50%;transform:translate(-50%,-50%);max-height:76%;max-width:180px;user-select:none}.obj.text{font-weight:700;color:white;white-space:nowrap;font-size:28px}
 .guide{position:absolute;left:0;right:0;top:50%;border-top:1px dashed #ffffff88;pointer-events:none}
 .controls{display:grid;gap:14px}.section{border-top:1px solid #eee;padding-top:14px}.section:first-child{border:0;padding-top:0}
@@ -21,7 +21,7 @@ label{display:block;font-size:12px;font-weight:700;margin-bottom:5px}.row{displa
 input,select,textarea,button{font:inherit;width:100%;padding:11px 12px;border:1px solid #d7d7d7;border-radius:11px;background:white;outline:none}input:focus,select:focus,textarea:focus{border-color:#e1322d;box-shadow:0 0 0 3px #e1322d12}
 input[type=color]{padding:2px;height:42px}input[type=range]{padding:0}
 button{cursor:pointer;font-weight:700}.primary{background:#e1322d;color:#fff;border-color:#e1322d}.primary:hover{background:#c92723}.secondary{background:#151515;color:#fff;border-color:#151515}
-.logo-list{display:grid;gap:8px}.logo-item{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:8px;background:#f5f5f5;padding:7px;border-radius:9px}.logo-item img{width:32px;height:32px;object-fit:contain}
+.logo-list{display:grid;gap:8px}.logo-item{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:8px;background:#f5f5f5;padding:7px;border-radius:9px}.logo-item img{width:32px;height:32px;object-fit:contain}.part-check{width:auto}.part-selected{outline:2px solid #e1322d}
 .small{font-size:12px;color:#666}.status{padding:10px;background:#fff4d8;border-radius:9px;font-size:12px}
 @media(max-width:900px){main{grid-template-columns:1fr}.mock{height:48vh}.controls{order:2}}
 </style>
@@ -58,7 +58,8 @@ button{cursor:pointer;font-weight:700}.primary{background:#e1322d;color:#fff;bor
   <div class="status" id="variantInfo">Normaal: één doorlopende productielijn.</div>
  </div>
  <div class="section">
-  <label>Lintkleur</label><input type="color" id="bg" value="#e1322d">
+  <label>Lintkleur</label>
+<div class="row"><input type="color" id="bg" value="#e1322d"><input id="bgHex" value="#E1322D" maxlength="7" aria-label="HEX lintkleur"></div>
  </div>
  <div class="section">
   <label>Logo uploaden</label><div class="small" style="margin-bottom:7px">SVG? Dan controleert de test eerst of het bestand zelf al uit losse vectoronderdelen bestaat.</div><input id="logoInput" type="file" accept="image/*,.svg" multiple>
@@ -67,6 +68,8 @@ button{cursor:pointer;font-weight:700}.primary{background:#e1322d;color:#fff;bor
   <div id="partsPanel" style="display:none;margin-top:9px">
     <label>Herkende SVG-onderdelen</label>
     <div id="partsList" class="logo-list"></div>
+<div class="row" style="margin-top:8px"><button type="button" id="groupParts">Selectie groeperen</button><button type="button" id="clearParts">Selectie wissen</button></div>
+<input id="groupName" placeholder="Naam groep, bijv. Beeldmerk" style="margin-top:8px">
     <div class="small" style="margin-top:6px">Automatisch voorstel; jij kunt altijd Compleet logo kiezen als de splitsing niet klopt.</div>
   </div>
  </div>
@@ -76,12 +79,23 @@ button{cursor:pointer;font-weight:700}.primary{background:#e1322d;color:#fff;bor
   <label style="margin-top:10px">Aantal plaatsingen <span id="countVal">7</span></label><input id="count" type="range" min="1" max="20" value="7">
   <label>Randmarge <span id="marginVal">6</span>%</label><input id="margin" type="range" min="0" max="25" value="6">
   <label>Verticale positie <span id="yVal">0</span></label><input id="y" type="range" min="-45" max="45" value="0">
-  <label>Rotatie gehele patroon <span id="rotVal">0</span>°</label><input id="rot" type="range" min="-180" max="180" value="0">
+  <label>Rotatie gehele patroon</label>
+<div class="row"><input id="rot" type="range" min="-180" max="180" value="0"><input id="rotInput" type="number" min="-180" max="180" value="0"></div>
+<div class="row" style="grid-template-columns:repeat(4,1fr);margin-top:7px">
+<button type="button" class="rotPreset" data-deg="0">0°</button><button type="button" class="rotPreset" data-deg="45">45°</button><button type="button" class="rotPreset" data-deg="90">90°</button><button type="button" class="rotPreset" data-deg="180">180°</button>
+</div>
  </div>
  <div class="section">
   <label>Tekst toevoegen</label><input id="text" placeholder="Bijv. www.xxlgifts.com">
-  <div class="row"><input id="textSize" type="number" value="28" min="8" max="80"><button id="addText">Tekst toevoegen</button></div>
-  <label style="margin-top:10px">Eigen lettertype / fontnaam</label><input id="fontNote" placeholder="Bijv. Gotham Bold">
+<div class="row" style="margin-top:8px"><div><label>Tekstgrootte</label><input id="textSize" type="number" value="28" min="8" max="80"></div><div><label>Tekstkleur</label><div class="row"><input id="textColor" type="color" value="#ffffff"><input id="textHex" value="#FFFFFF" maxlength="7"></div></div></div>
+<label style="margin-top:10px">Lettertype</label>
+<select id="textFont">
+<option value="Montserrat">Montserrat</option><option value="Arial">Arial</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet MS</option><option value="Georgia">Georgia</option><option value="Times New Roman">Times New Roman</option><option value="Courier New">Courier New</option>
+</select>
+<button id="addText" style="margin-top:8px">Tekst toevoegen</button>
+<label style="margin-top:12px">Eigen huisstijllettertype (productie-opmerking)</label>
+<input id="fontNote" placeholder="Bijv. Gotham Bold">
+<div class="small">Dit veld verandert de live preview niet. We nemen de fontnaam mee voor productiecontrole. Later kunnen we font-upload toevoegen.</div>
  </div>
  <div class="section">
   <label>Complete lijntekening uploaden</label><input id="fullArtwork" type="file" accept="image/*,.svg">
@@ -94,7 +108,7 @@ button{cursor:pointer;font-weight:700}.primary{background:#e1322d;color:#fff;bor
 </main>
 <script>
 const $=s=>document.querySelector(s), strip=$('#strip');
-let logos=[], texts=[];
+let logos=[], texts=[], latestSvgParts=null;
 function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function renderList(){ $('#logoList').innerHTML=logos.map((l,i)=>`<div class="logo-item"><img src="${l.url}"><span>${String.fromCharCode(65+i)} · ${esc(l.name)}</span><button onclick="removeLogo(${i})" style="width:auto;padding:5px 8px">×</button></div>`).join(''); }
 window.removeLogo=i=>{URL.revokeObjectURL(logos[i].url);logos.splice(i,1);renderList();render()}
@@ -107,7 +121,7 @@ function render(){
  strip.style.background=$('#bg').value;
  [...strip.querySelectorAll('.obj,.full')].forEach(n=>n.remove());
  const count=+$('input#count').value, m=+$('input#margin').value, y=+$('input#y').value, rot=+$('input#rot').value;
- $('#countVal').textContent=count;$('#marginVal').textContent=m;$('#yVal').textContent=y;$('#rotVal').textContent=rot;
+ $('#countVal').textContent=count;$('#marginVal').textContent=m;$('#yVal').textContent=y;if($('#rotVal'))$('#rotVal').textContent=rot;
  const seq=sequence();
  if(logos.length){
   for(let i=0;i<count;i++){
@@ -118,7 +132,7 @@ function render(){
    strip.appendChild(img);
   }
  }
- texts.forEach(t=>{const d=document.createElement('div');d.className='obj text';d.textContent=t.text;d.style.left=t.x+'%';d.style.fontSize=t.size+'px';strip.appendChild(d)})
+ texts.forEach(t=>{const d=document.createElement('div');d.className='obj text';d.textContent=t.text;d.style.left=t.x+'%';d.style.fontSize=t.size+'px';d.style.color=t.color||'#fff';d.style.fontFamily=t.font||'Montserrat';strip.appendChild(d)})
 }
 
 function bboxScore(el){
@@ -150,13 +164,13 @@ async function addUploadedFile(f){
     const a=await analyseSvg(f);
     if(a && a.candidates.length>=2 && a.candidates.length<=8){
       const complete=URL.createObjectURL(f);
-      const parts=a.candidates.map((c,i)=>({name:`Onderdeel ${String.fromCharCode(65+i)}`,url:svgElToUrl(a.svg,[c.node],a.vb)}));
+      const parts=a.candidates.map((c,i)=>({name:`Onderdeel ${String.fromCharCode(65+i)}`,url:svgElToUrl(a.svg,[c.node],a.vb),node:c.node,svg:a.svg,vb:a.vb})); latestSvgParts=parts;
       $('#svgAnalysis').style.display='block';
       $('#svgAnalysis').innerHTML=`<strong>SVG geanalyseerd:</strong> ${parts.length} brononderdelen gevonden. We splitsen alleen op groepen/paden die al in het originele SVG-bestand bestaan — nooit midden in letters of vormen.`;
       $('#partsPanel').style.display='block';
       $('#partsList').innerHTML=
         `<div class="logo-item"><span style="font-weight:800">✓</span><span>Compleet logo · altijd veilig</span><button type="button" style="width:auto" id="useComplete">Gebruik</button></div>`+
-        parts.map((p,i)=>`<div class="logo-item"><img src="${p.url}"><span>${p.name}</span><button type="button" style="width:auto" data-part="${i}">Gebruik</button></div>`).join('');
+        parts.map((p,i)=>`<div class="logo-item" data-part-row="${i}"><input class="part-check" type="checkbox" data-check="${i}"><img src="${p.url}"><span>${p.name}</span><button type="button" style="width:auto" data-part="${i}">Gebruik</button></div>`).join('');
       $('#useComplete').onclick=()=>{logos=[{name:f.name,url:complete}];renderList();render()};
       [...$('#partsList').querySelectorAll('[data-part]')].forEach(b=>b.onclick=()=>{
         const p=parts[+b.dataset.part]; logos.push({name:p.name,url:p.url});renderList();render()
@@ -172,7 +186,7 @@ async function addUploadedFile(f){
 $('#logoInput').onchange=async e=>{for(const f of [...e.target.files]) await addUploadedFile(f)}
 
 ['bg','pattern','count','margin','y','rot'].forEach(id=>$('#'+id).addEventListener('input',render));
-$('#addText').onclick=()=>{if($('#text').value.trim()){texts.push({text:$('#text').value.trim(),size:+$('#textSize').value||28,x:50});$('#text').value='';render()}}
+$('#addText').onclick=()=>{if($('#text').value.trim()){texts.push({text:$('#text').value.trim(),size:+$('#textSize').value||28,x:50,color:$('#textColor').value,font:$('#textFont').value});$('#text').value='';render()}}
 $('#reset').onclick=()=>{$('#count').value=7;$('#margin').value=6;$('#y').value=0;$('#rot').value=0;render()}
 $('#variant').onchange=e=>{
  const v=e.target.value, info=$('#variantInfo');
@@ -190,6 +204,40 @@ $('#downloadSvg').onclick=()=>{
  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${body}</svg>`;
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));a.download='keycord-productielijn-test.svg';a.click();
 }
+
+function normalizeHex(v){
+ v=(v||'').trim(); if(!v.startsWith('#')) v='#'+v;
+ if(/^#[0-9a-fA-F]{3}$/.test(v)) v='#'+v.slice(1).split('').map(c=>c+c).join('');
+ return /^#[0-9a-fA-F]{6}$/.test(v)?v.toUpperCase():null;
+}
+$('#bgHex').addEventListener('input',e=>{const h=normalizeHex(e.target.value);if(h){$('#bg').value=h;render()}});
+$('#bg').addEventListener('input',e=>{$('#bgHex').value=e.target.value.toUpperCase()});
+$('#textHex').addEventListener('input',e=>{const h=normalizeHex(e.target.value);if(h)$('#textColor').value=h});
+$('#textColor').addEventListener('input',e=>{$('#textHex').value=e.target.value.toUpperCase()});
+
+let rotSnapping=false;
+$('#rot').addEventListener('input',e=>{
+ let v=+e.target.value;
+ const snaps=[-180,-135,-90,-45,0,45,90,135,180];
+ const near=snaps.find(s=>Math.abs(s-v)<=3);
+ if(near!==undefined) v=near;
+ e.target.value=v; $('#rotInput').value=v; render();
+});
+$('#rotInput').addEventListener('input',e=>{let v=Math.max(-180,Math.min(180,+e.target.value||0));$('#rot').value=v;render()});
+document.querySelectorAll('.rotPreset').forEach(b=>b.onclick=()=>{$('#rot').value=b.dataset.deg;$('#rotInput').value=b.dataset.deg;render()});
+
+$('#groupParts').onclick=()=>{
+ if(!latestSvgParts) return;
+ const ids=[...document.querySelectorAll('[data-check]:checked')].map(c=>+c.dataset.check);
+ if(ids.length<2){alert('Selecteer minimaal 2 SVG-onderdelen om te groeperen.');return}
+ const p0=latestSvgParts[ids[0]];
+ const nodes=ids.map(i=>latestSvgParts[i].node);
+ const name=$('#groupName').value.trim()||'Groep';
+ const url=svgElToUrl(p0.svg,nodes,p0.vb);
+ logos.push({name,url}); renderList(); render();
+};
+$('#clearParts').onclick=()=>document.querySelectorAll('[data-check]').forEach(c=>c.checked=false);
+
 render();
 </script>
 </body></html>

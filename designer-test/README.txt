@@ -40,3 +40,12 @@ V3 SVG analyzer:
 - toont gevonden brononderdelen als A/B/C...
 - beweert niet automatisch dat A 'beeldmerk' en B 'woordmerk' is
 - interne geometrie van elk onderdeel blijft intact
+
+V4 feedbackronde:
+- productielijn standaard fit-to-width, geen horizontale scroll
+- lintkleur: color picker + gekoppeld HEX veld
+- tekstkleur: color picker + HEX
+- live ondersteunde fontkeuze
+- eigen huisstijlfont duidelijk als productie-opmerking
+- rotatie: slider + exact getal + presets 0/45/90/180 + magnetische snap binnen 3 graden
+- SVG brononderdelen selecteren en groeperen met eigen groepsnaam
