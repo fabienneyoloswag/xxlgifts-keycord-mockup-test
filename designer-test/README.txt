@@ -25,3 +25,18 @@ Nog bewust NIET definitief:
 - echte Smart Object-render
 - productie-export met alle geüploade logo-assets ingebed
 - individuele object-editor/snaplijnen (volgende iteratie)
+
+V2 huisstijl:
+- Montserrat via Google Fonts
+- exact XXLGifts-logo, pagina/artboard 1 van aangeleverde Illustrator
+- XXLGifts header + Powered by XXLGifts
+- inputs/buttons/cards verfijnd
+- bestaande designer-test functionaliteit behouden
+
+V3 SVG analyzer:
+- leest SVG client-side in de browser
+- splitst conservatief alleen op bestaande top-level vectorgroepen/paden
+- toont Compleet logo altijd als veilige fallback
+- toont gevonden brononderdelen als A/B/C...
+- beweert niet automatisch dat A 'beeldmerk' en B 'woordmerk' is
+- interne geometrie van elk onderdeel blijft intact

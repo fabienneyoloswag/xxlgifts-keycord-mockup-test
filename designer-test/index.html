@@ -5,28 +5,35 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>XXLGifts Keycord Designer Test</title>
 <style>
-:root{font-family:Montserrat,Arial,sans-serif;color:#171717;background:#f3f3f3}
-*{box-sizing:border-box} body{margin:0}.top{background:#fff;padding:16px 24px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;align-items:center}
-.badge{font-size:12px;background:#ffe6e6;color:#b40000;padding:6px 9px;border-radius:999px;font-weight:700}
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+:root{font-family:'Montserrat',Arial,sans-serif;color:#171717;background:#f4f4f4}
+*{box-sizing:border-box} body{margin:0}.top{background:#fff;padding:13px 24px;border-bottom:1px solid #e7e7e7;display:flex;justify-content:space-between;align-items:center;gap:16px;position:sticky;top:0;z-index:20}.brand{display:flex;align-items:center;gap:12px}.brand img{width:48px;height:48px;object-fit:contain;border-radius:10px;background:#fff}.brand-title{font-weight:800;font-size:15px}.brand-sub{font-size:11px;color:#777;margin-top:2px;font-weight:600}
+.badge{font-size:11px;background:#fff0f0;color:#d92c27;padding:7px 10px;border-radius:999px;font-weight:800;white-space:nowrap}
 main{max-width:1500px;margin:auto;padding:20px;display:grid;grid-template-columns:minmax(0,1.8fr) minmax(330px,.8fr);gap:18px}
 .card{background:#fff;border-radius:18px;padding:18px;box-shadow:0 2px 12px #0000000c}.card h2{margin:0 0 12px}
 .mock{height:min(58vh,650px);border-radius:14px;background:#eee;display:grid;place-items:center;overflow:hidden;position:relative}
 .mock img{width:100%;height:100%;object-fit:contain}.mock .placeholder{text-align:center;color:#777}
-.editor{margin-top:18px}.stripwrap{overflow:auto;padding:16px 0}.strip{position:relative;height:130px;min-width:1100px;background:#e51b23;border:1px solid #bbb;overflow:hidden}
+.editor{margin-top:18px}.stripwrap{overflow:auto;padding:16px 0}.strip{position:relative;height:130px;min-width:1100px;background:#e1322d;border:1px solid #bbb;overflow:hidden}
 .obj{position:absolute;top:50%;transform:translate(-50%,-50%);max-height:76%;max-width:180px;user-select:none}.obj.text{font-weight:700;color:white;white-space:nowrap;font-size:28px}
 .guide{position:absolute;left:0;right:0;top:50%;border-top:1px dashed #ffffff88;pointer-events:none}
 .controls{display:grid;gap:14px}.section{border-top:1px solid #eee;padding-top:14px}.section:first-child{border:0;padding-top:0}
 label{display:block;font-size:12px;font-weight:700;margin-bottom:5px}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-input,select,textarea,button{font:inherit;width:100%;padding:10px;border:1px solid #ccc;border-radius:9px;background:white}
+input,select,textarea,button{font:inherit;width:100%;padding:11px 12px;border:1px solid #d7d7d7;border-radius:11px;background:white;outline:none}input:focus,select:focus,textarea:focus{border-color:#e1322d;box-shadow:0 0 0 3px #e1322d12}
 input[type=color]{padding:2px;height:42px}input[type=range]{padding:0}
-button{cursor:pointer;font-weight:700}.primary{background:#e30613;color:#fff;border-color:#e30613}.secondary{background:#111;color:#fff;border-color:#111}
+button{cursor:pointer;font-weight:700}.primary{background:#e1322d;color:#fff;border-color:#e1322d}.primary:hover{background:#c92723}.secondary{background:#151515;color:#fff;border-color:#151515}
 .logo-list{display:grid;gap:8px}.logo-item{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:8px;background:#f5f5f5;padding:7px;border-radius:9px}.logo-item img{width:32px;height:32px;object-fit:contain}
 .small{font-size:12px;color:#666}.status{padding:10px;background:#fff4d8;border-radius:9px;font-size:12px}
 @media(max-width:900px){main{grid-template-columns:1fr}.mock{height:48vh}.controls{order:2}}
 </style>
 </head>
 <body>
-<div class="top"><strong>XXLGifts · Keycord Designer</strong><span class="badge">DESIGNER TEST · geen invloed op main</span></div>
+<div class="top">
+      <div class="brand">
+        <img src="assets/xxlgifts-square-logo.png" alt="XXLGifts">
+        <div><div class="brand-title">Keycord Designer</div><div class="brand-sub">Powered by XXLGifts</div></div>
+      </div>
+      <span class="badge">DESIGNER TEST · geen invloed op main</span>
+    </div>
 <main>
 <section>
  <div class="card">
@@ -51,11 +58,17 @@ button{cursor:pointer;font-weight:700}.primary{background:#e30613;color:#fff;bor
   <div class="status" id="variantInfo">Normaal: één doorlopende productielijn.</div>
  </div>
  <div class="section">
-  <label>Lintkleur</label><input type="color" id="bg" value="#e51b23">
+  <label>Lintkleur</label><input type="color" id="bg" value="#e1322d">
  </div>
  <div class="section">
-  <label>Logo's toevoegen (meerdere mogelijk)</label><input id="logoInput" type="file" accept="image/*,.svg" multiple>
+  <label>Logo uploaden</label><div class="small" style="margin-bottom:7px">SVG? Dan controleert de test eerst of het bestand zelf al uit losse vectoronderdelen bestaat.</div><input id="logoInput" type="file" accept="image/*,.svg" multiple>
   <div class="logo-list" id="logoList"></div>
+  <div id="svgAnalysis" class="status" style="display:none;margin-top:9px"></div>
+  <div id="partsPanel" style="display:none;margin-top:9px">
+    <label>Herkende SVG-onderdelen</label>
+    <div id="partsList" class="logo-list"></div>
+    <div class="small" style="margin-top:6px">Automatisch voorstel; jij kunt altijd Compleet logo kiezen als de splitsing niet klopt.</div>
+  </div>
  </div>
  <div class="section">
   <label>Patroon / volgorde</label>
@@ -107,7 +120,57 @@ function render(){
  }
  texts.forEach(t=>{const d=document.createElement('div');d.className='obj text';d.textContent=t.text;d.style.left=t.x+'%';d.style.fontSize=t.size+'px';strip.appendChild(d)})
 }
-$('#logoInput').onchange=e=>{[...e.target.files].forEach(f=>logos.push({name:f.name,url:URL.createObjectURL(f)}));renderList();render()}
+
+function bboxScore(el){
+  const tag=el.tagName.toLowerCase();
+  let score=1;
+  if(tag.includes('g')) score+=4;
+  if(el.children && el.children.length) score+=Math.min(5,el.children.length);
+  if(el.getAttribute('id')) score+=1;
+  return score;
+}
+function svgElToUrl(svgRoot, nodes, vb){
+  const ns='http://www.w3.org/2000/svg';
+  const clone=document.createElementNS(ns,'svg');
+  clone.setAttribute('xmlns',ns); clone.setAttribute('viewBox',vb);
+  nodes.forEach(n=>clone.appendChild(n.cloneNode(true)));
+  return URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(clone)],{type:'image/svg+xml'}));
+}
+async function analyseSvg(file){
+  const txt=await file.text(), doc=new DOMParser().parseFromString(txt,'image/svg+xml');
+  if(doc.querySelector('parsererror')) return null;
+  const svg=doc.documentElement, vb=svg.getAttribute('viewBox')||`0 0 ${svg.getAttribute('width')||1000} ${svg.getAttribute('height')||1000}`;
+  const kids=[...svg.children].filter(n=>!['defs','style','title','desc','metadata'].includes(n.tagName.toLowerCase()));
+  // Conservative rule: only offer a split when the source itself already exposes multiple top-level visual groups/elements.
+  const candidates=kids.map((n,i)=>({node:n,i,score:bboxScore(n)})).filter(x=>x.score>=1);
+  return {txt,svg,vb,candidates};
+}
+async function addUploadedFile(f){
+  if(f.type==='image/svg+xml' || f.name.toLowerCase().endsWith('.svg')){
+    const a=await analyseSvg(f);
+    if(a && a.candidates.length>=2 && a.candidates.length<=8){
+      const complete=URL.createObjectURL(f);
+      const parts=a.candidates.map((c,i)=>({name:`Onderdeel ${String.fromCharCode(65+i)}`,url:svgElToUrl(a.svg,[c.node],a.vb)}));
+      $('#svgAnalysis').style.display='block';
+      $('#svgAnalysis').innerHTML=`<strong>SVG geanalyseerd:</strong> ${parts.length} brononderdelen gevonden. We splitsen alleen op groepen/paden die al in het originele SVG-bestand bestaan — nooit midden in letters of vormen.`;
+      $('#partsPanel').style.display='block';
+      $('#partsList').innerHTML=
+        `<div class="logo-item"><span style="font-weight:800">✓</span><span>Compleet logo · altijd veilig</span><button type="button" style="width:auto" id="useComplete">Gebruik</button></div>`+
+        parts.map((p,i)=>`<div class="logo-item"><img src="${p.url}"><span>${p.name}</span><button type="button" style="width:auto" data-part="${i}">Gebruik</button></div>`).join('');
+      $('#useComplete').onclick=()=>{logos=[{name:f.name,url:complete}];renderList();render()};
+      [...$('#partsList').querySelectorAll('[data-part]')].forEach(b=>b.onclick=()=>{
+        const p=parts[+b.dataset.part]; logos.push({name:p.name,url:p.url});renderList();render()
+      });
+      // Auto proposal: use all exposed source parts separately, but do NOT pretend semantic certainty.
+      logos=parts.map(p=>({name:p.name,url:p.url}));
+      renderList(); render();
+      return;
+    }
+  }
+  logos.push({name:f.name,url:URL.createObjectURL(f)}); renderList(); render();
+}
+$('#logoInput').onchange=async e=>{for(const f of [...e.target.files]) await addUploadedFile(f)}
+
 ['bg','pattern','count','margin','y','rot'].forEach(id=>$('#'+id).addEventListener('input',render));
 $('#addText').onclick=()=>{if($('#text').value.trim()){texts.push({text:$('#text').value.trim(),size:+$('#textSize').value||28,x:50});$('#text').value='';render()}}
 $('#reset').onclick=()=>{$('#count').value=7;$('#margin').value=6;$('#y').value=0;$('#rot').value=0;render()}
