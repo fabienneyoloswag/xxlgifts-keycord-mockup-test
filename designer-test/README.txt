@@ -71,3 +71,12 @@ V7 fixes:
 - meerdere groepen tegelijk gebruiken via 'Gebruik geselecteerde groepen'
 - geselecteerde groepen worden automatisch patroon A-B-C... en midden uitgelijnd
 - losse 'Gebruik' heet nu 'Los gebruiken' om verwarring te voorkomen
+
+V8 cleanup:
+- XXLGifts headerlogo is embedded directly in HTML (geen ontbrekend assetpad meer)
+- SVG-groepen worden op hun echte zichtbare bounding box gecropt
+- middenuitlijning is daardoor optisch correct in plaats van gebaseerd op lege SVG-canvasruimte
+- rechter sidebar sticky + compactere cards, minder paginaschrollen
+- mockupvlak lager zodat ontwerpverdeling sneller tegelijk zichtbaar is
+- 'Productielijn' hernoemd naar 'Ontwerpverdeling': dit is nog geen productie-template
+- echte lijntekening wordt in de nieuwe /keycord-editor/ gekoppeld aan de echte assets
