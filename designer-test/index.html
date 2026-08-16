@@ -99,7 +99,10 @@ button{cursor:pointer;font-weight:700}.primary{background:#e1322d;color:#fff;bor
 </div>
   <input id="pattern" value="A" placeholder="Bijv. A-B-A-B of A-A-B">
   <label style="margin-top:10px">Aantal plaatsingen <span id="countVal">7</span></label><input id="count" type="range" min="1" max="20" value="7">
-  <label>Randmarge <span id="marginVal">6</span>%</label><input id="margin" type="range" min="0" max="25" value="6">
+  <label>Ruimte tussen logo's / groepen <span id="spacingVal">0</span>%</label>
+  <div class="row"><input id="spacing" type="range" min="-80" max="200" value="0"><input id="spacingInput" type="number" min="-80" max="200" value="0"></div>
+  <div class="small">0% = automatische verdeling. Positief = meer ruimte, negatief = dichter op elkaar.</div>
+  <label style="margin-top:8px">Randmarge <span id="marginVal">6</span>%</label><input id="margin" type="range" min="0" max="25" value="6">
   <label>Verticale positie <span id="yVal">0</span></label><input id="y" type="range" min="-45" max="45" value="0">
   <label>Rotatie gehele patroon</label>
 <div class="row"><input id="rot" type="range" min="-180" max="180" value="0"><input id="rotInput" type="number" min="-180" max="180" value="0"></div>
@@ -142,13 +145,16 @@ function sequence(){
 function render(){
  strip.style.background=$('#bg').value;
  [...strip.querySelectorAll('.obj,.full')].forEach(n=>n.remove());
- const count=+$('input#count').value, m=+$('input#margin').value, y=+$('input#y').value, rot=+$('input#rot').value;
- $('#countVal').textContent=count;$('#marginVal').textContent=m;$('#yVal').textContent=y;if($('#rotVal'))$('#rotVal').textContent=rot;
+ const count=+$('input#count').value, m=+$('input#margin').value, spacing=+$('input#spacing').value, y=+$('input#y').value, rot=+$('input#rot').value;
+ $('#countVal').textContent=count;$('#spacingVal').textContent=spacing;$('#spacingInput').value=spacing;$('#marginVal').textContent=m;$('#yVal').textContent=y;if($('#rotVal'))$('#rotVal').textContent=rot;
  const seq=sequence();
  if(logos.length){
   for(let i=0;i<count;i++){
    const li=seq[i%seq.length] ?? 0, l=logos[li]; if(!l) continue;
-   const x=count===1?50:m+(100-2*m)*(i/(count-1));
+   const autoStep=count>1?(100-2*m)/(count-1):0;
+   const step=autoStep*(1+spacing/100);
+   const total=step*(count-1);
+   const x=count===1?50:50-total/2+i*step;
    const img=document.createElement('img'); img.src=l.url; img.className='obj';
    img.style.left=x+'%';
    const alignOffset = l.align==='top' ? -24 : (l.align==='bottom' ? 24 : 0);
@@ -306,9 +312,9 @@ async function addUploadedFile(f){
 }
 $('#logoInput').onchange=async e=>{for(const f of [...e.target.files]) await addUploadedFile(f)}
 
-['bg','pattern','count','margin','y','rot'].forEach(id=>$('#'+id).addEventListener('input',render));
+['bg','pattern','count','spacing','margin','y','rot'].forEach(id=>$('#'+id).addEventListener('input',render));
 $('#addText').onclick=()=>{if($('#text').value.trim()){texts.push({text:$('#text').value.trim(),size:+$('#textSize').value||28,x:50,color:$('#textColor').value,font:$('#textFont').value});$('#text').value='';render()}}
-$('#reset').onclick=()=>{$('#count').value=7;$('#margin').value=6;$('#y').value=0;$('#rot').value=0;render()}
+$('#reset').onclick=()=>{$('#count').value=7;$('#spacing').value=0;$('#spacingInput').value=0;$('#margin').value=6;$('#y').value=0;$('#rot').value=0;render()}
 $('#variant').onchange=e=>{
  const v=e.target.value, info=$('#variantInfo');
  info.textContent={normal:'Normaal: één doorlopende productielijn.',safety:'Safety: links/rechts productielogica; rechter artworkzijde wordt in productie 180° verwerkt voor doorloop.',buckle:'Buckle: gebruikt straks het langere buckle-artboard uit de Illustrator-template.',buckleSafety:'Buckle + Safety: langer buckle-artboard + links/rechts safety-logica.'}[v];
@@ -335,6 +341,7 @@ $('#bgHex').addEventListener('input',e=>{const h=normalizeHex(e.target.value);if
 $('#bg').addEventListener('input',e=>{$('#bgHex').value=e.target.value.toUpperCase()});
 $('#textHex').addEventListener('input',e=>{const h=normalizeHex(e.target.value);if(h)$('#textColor').value=h});
 $('#textColor').addEventListener('input',e=>{$('#textHex').value=e.target.value.toUpperCase()});
+$('#spacingInput').addEventListener('input',e=>{let v=Math.max(-80,Math.min(200,+e.target.value||0));$('#spacing').value=v;render()});
 
 let rotSnapping=false;
 $('#rot').addEventListener('input',e=>{
