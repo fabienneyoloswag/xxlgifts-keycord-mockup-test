@@ -1,177 +1,223 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#101010">
-  <title>XXLGifts Mockup Studio</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XXLGifts Keycord Editor</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+:root{--red:#e1322d;--black:#161616;--green:#34a853;--muted:#777;--line:#e7e7e7;--bg:#f5f5f5}
+*{box-sizing:border-box} body{margin:0;font-family:Montserrat,Arial,sans-serif;color:#171717;background:var(--bg)}
+button,input,select,textarea{font:inherit}
+.top{height:76px;background:#161616;color:white;display:flex;align-items:center;justify-content:space-between;padding:0 4vw;position:sticky;top:0;z-index:50}
+.brand{display:flex;align-items:center;gap:14px} .brand img{width:48px;height:48px;object-fit:contain;background:#fff;border-radius:8px}
+.brand strong{font-size:20px} .brand small{display:block;color:#ccc;margin-top:2px}
+.top-actions{display:flex;gap:10px} .pill{border:1px solid #444;border-radius:999px;padding:9px 14px;font-size:12px;color:#ddd}
+.shell{max-width:1500px;margin:auto;display:grid;grid-template-columns:minmax(520px,1.25fr) minmax(440px,.75fr);gap:18px;padding:22px}
+.preview-card,.panel{background:white;border-radius:18px;box-shadow:0 4px 22px #0000000a;border:1px solid #ededed}
+.preview-card{padding:18px;position:sticky;top:98px;height:calc(100vh - 120px);display:flex;flex-direction:column}
+.preview-head{display:flex;align-items:center;justify-content:space-between;gap:12px} h1{font-size:25px;margin:0} .preview-head p{margin:4px 0 0;color:#777;font-size:12px}
+.step-chip{background:#fff0ef;color:var(--red);font-size:11px;font-weight:800;padding:7px 11px;border-radius:999px}
+.mock-stage{flex:1;min-height:420px;margin-top:14px;background:linear-gradient(180deg,#f8f8f8,#eee);border-radius:15px;position:relative;display:grid;place-items:center;overflow:hidden}
+.mock-stage img.keycord{max-height:88%;max-width:70%;object-fit:contain;filter:drop-shadow(0 16px 18px #0002)}
+.logo-overlay{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);max-width:115px;max-height:70px;object-fit:contain;pointer-events:none}
+.mock-caption{position:absolute;left:16px;bottom:14px;background:#ffffffdd;border:1px solid #eee;border-radius:12px;padding:9px 11px;font-size:11px;backdrop-filter:blur(8px)}
+.productline{margin-top:12px;background:#fff;border:1px solid #ddd;border-radius:12px;padding:11px}
+.productline-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px} .productline-head b{font-size:13px} .productline-head span{font-size:10px;color:#777}
+.strip{height:62px;border-radius:8px;background:#e1322d;display:flex;align-items:center;overflow:hidden;padding:0 20px;gap:28px}
+.strip .repeat{height:32px;min-width:72px;object-fit:contain;filter:brightness(0) invert(1)}
+.preview-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px} .btn{border:0;border-radius:12px;padding:13px 15px;font-weight:800;cursor:pointer}
+.btn.primary{background:var(--red);color:white} .btn.dark{background:#171717;color:white} .btn.light{background:#f1f1f1;color:#222}
+.panel{padding:0;overflow:hidden} .steps{display:flex;border-bottom:1px solid #eee;background:#fafafa;position:sticky;top:76px;z-index:20}
+.step{flex:1;padding:14px 8px;border:0;background:none;font-weight:700;color:#999;cursor:pointer;font-size:11px} .step.active{color:var(--red);box-shadow:inset 0 -3px var(--red)}
+.content{padding:18px;max-height:calc(100vh - 140px);overflow:auto} .section{display:none} .section.active{display:block}
+.section h2{font-size:20px;margin:0 0 5px} .lead{font-size:12px;color:#777;margin:0 0 16px}
+.choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.choice-card{position:relative;min-height:82px;border:1px solid #ddd;border-radius:13px;background:#fff;padding:11px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:700}
+.choice-card:hover{border-color:#aaa} .choice-card.selected{border-color:var(--red);box-shadow:0 0 0 2px #e1322d18}
+.choice-card i{display:none;position:absolute;right:8px;top:7px;background:var(--red);color:white;border-radius:50%;width:19px;height:19px;font-style:normal;text-align:center;font-size:12px;line-height:19px}
+.choice-card.selected i{display:block} .thumb{width:58px;height:58px;border-radius:10px;background:#f5f5f5;display:grid;place-items:center;overflow:hidden;flex:none}
+.thumb img{width:100%;height:100%;object-fit:contain}
+.width-card{min-height:68px;justify-content:center;text-align:center;font-size:17px}
+.field{margin:13px 0} label{display:block;font-size:11px;font-weight:800;margin-bottom:6px}
+.input-row{display:grid;grid-template-columns:52px 1fr;gap:8px} input[type=color]{width:52px;height:42px;padding:2px;border:1px solid #ddd;border-radius:10px;background:#fff}
+input[type=text],input[type=number],select,textarea{width:100%;padding:11px 12px;border:1px solid #d8d8d8;border-radius:10px;background:white}
+.range-row{display:grid;grid-template-columns:1fr 70px;gap:10px;align-items:center} input[type=range]{width:100%;accent-color:var(--red)}
+.upload{border:2px dashed #d4d4d4;border-radius:13px;padding:18px;text-align:center;background:#fafafa} .upload input{width:100%;margin-top:10px}
+.access-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px} .access-card{min-height:105px}
+.nav{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;border-top:1px solid #eee;padding-top:15px}
+.summary{display:grid;gap:10px} .sumrow{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid #eee;font-size:12px}
+.info{background:#fff7df;border:1px solid #f2dd96;border-radius:11px;padding:10px 12px;font-size:11px;line-height:1.45}
+.tech-editor{background:#fafafa;border:1px solid #e5e5e5;border-radius:13px;padding:12px} .mini-title{font-weight:800;font-size:12px;margin-bottom:8px}
+@media(max-width:980px){.shell{grid-template-columns:1fr;padding:10px}.preview-card{position:relative;top:auto;height:auto;min-height:620px}.content{max-height:none}.steps{top:76px}}
+</style>
 </head>
 <body>
-<header class="topbar">
-  <div class="brandmark">XXL</div>
-  <div class="brandcopy"><strong>Mockup Studio</strong><span>Front/Back Engine v5</span></div>
-  <div class="live"><i></i> Live</div>
+<header class="top">
+  <div class="brand"><img src="assets/branding/xxlgifts-logo.png"><div><strong>Keycord Designer</strong><small>Powered by XXLGifts</small></div></div>
+  <div class="top-actions"><span class="pill">Nieuwe klantversie · test</span></div>
 </header>
+<main class="shell">
+<section class="preview-card">
+  <div class="preview-head"><div><h1>Jouw keycord</h1><p>Bekijk je keuzes direct in de preview.</p></div><span class="step-chip" id="previewVariant">Normaal · 20 mm</span></div>
+  <div class="mock-stage">
+    <img id="mockImg" class="keycord" src="assets/mockups/20mm-Keycord-DEF.png">
+    <img id="logoOverlay" class="logo-overlay" style="display:none">
+    <div class="mock-caption"><b id="captionHook">Duimhaak</b> · <span id="captionColor">#E1322D</span></div>
+  </div>
+  <div class="productline">
+    <div class="productline-head"><b>Ontwerpverdeling</b><span>technische test · echte productielijn volgt later</span></div>
+    <div id="strip" class="strip"></div>
+  </div>
+  <div class="preview-actions"><button class="btn dark" id="downloadPreview">Preview PNG</button><button class="btn primary" id="requestDemo">Offerte-aanvraag (demo)</button></div>
+</section>
 
-<main class="workspace">
-  <aside class="controls">
-    <p class="eyebrow">Echte voor- en achterkant</p>
-    <h1>Keycord mockup</h1>
-    <p class="intro">Het teruglopende lint wordt eerst gerenderd en 180° gedraaid. Daarna komt het voorste lint erbovenop, zodat kruisingen correct verdwijnen.</p>
-
-    <label class="title">1. Template</label>
-    <select id="template"></select>
-
-    <label class="title">2. Bedrukkingsopbouw</label>
-    <select id="designMode">
-      <option value="repeat">Eén logo herhalen</option>
-      <option value="separate">Voorste en teruglopende lint apart</option>
-      <option value="continuous">Volledig doorlopend ontwerp</option>
-    </select>
-
-    <div id="repeatUpload" class="mode-panel">
-      <label class="upload">
-        <span class="plus">+</span>
-        <b id="filename">Kies logo: SVG of PNG</b>
-        <small>Wordt automatisch langs beide lintdelen herhaald</small>
-        <input id="logoInput" type="file" accept=".svg,.png,.jpg,.jpeg,.webp,image/*">
-      </label>
-    </div>
-
-    <div id="separateUploads" class="mode-panel hidden">
-      <div class="dual-upload">
-        <label class="upload compact-upload">
-          <span class="plus">+</span>
-          <b id="frontFilename">Ontwerp voorste lint</b>
-          <small>Logo, tekst of lijntekening</small>
-          <input id="frontDesignInput" type="file" accept=".svg,.png,.jpg,.jpeg,.webp,image/*">
-        </label>
-        <label class="upload compact-upload">
-          <span class="plus">+</span>
-          <b id="backFilename">Ontwerp teruglopend lint</b>
-          <small>Mag volledig anders zijn</small>
-          <input id="backDesignInput" type="file" accept=".svg,.png,.jpg,.jpeg,.webp,image/*">
-        </label>
-      </div>
-    </div>
-
-    <div id="continuousUpload" class="mode-panel hidden">
-      <label class="upload">
-        <span class="plus">+</span>
-        <b id="continuousFilename">Kies volledige lijntekening</b>
-        <small>Langwerpige SVG of PNG aanbevolen</small>
-        <input id="continuousDesignInput" type="file" accept=".svg,.png,.jpg,.jpeg,.webp,image/*">
-      </label>
-      <label class="checkrow continuous-check">
-        <input id="repeatContinuous" type="checkbox">
-        <span><b>Ontwerp herhalen</b><small>Uit = één ontwerp over de volledige zichtbare lengte.</small></span>
-      </label>
-    </div>
-
-    <label class="title">3. Haak kiezen</label>
-    <select id="hook"></select>
-
-    <label class="title">4. Keycordkleur</label>
-    <div class="colorrow">
-      <input id="color" type="color" value="#e30613">
-      <input id="hex" value="#E30613" maxlength="7">
-    </div>
-
-    <label class="range-label"><span>Logoformaat algemeen</span><b id="sizeValue">52%</b></label>
-    <input id="size" class="full-range" type="range" min="25" max="95" value="52">
-
-    <div class="side-grid">
-      <section class="side-card">
-        <div class="side-title">
-          <span>Voorste lint</span>
-          <small>Links / bovenliggend</small>
+<aside class="panel">
+  <div class="steps">
+    <button class="step active" data-step="1">1 · Model</button>
+    <button class="step" data-step="2">2 · Haak</button>
+    <button class="step" data-step="3">3 · Ontwerp</button>
+    <button class="step" data-step="4">4 · Controle</button>
+  </div>
+  <div class="content">
+    <section class="section active" data-section="1">
+      <h2>Kies je keycord</h2><p class="lead">Eerst het model en de breedte. Daarna bouwen we hem visueel verder op.</p>
+      <div class="field"><label>MODEL</label>
+        <div class="choice-grid" id="variantGrid">
+          <button class="choice-card selected" data-variant="normal"><span><b>Normaal</b><br><small>Standaard keycord</small></span><i>✓</i></button>
+          <button class="choice-card" data-variant="safety"><span><b>Safety</b><br><small>Met safety breakaway</small></span><i>✓</i></button>
+          <button class="choice-card" data-variant="buckle"><span><b>Buckle</b><br><small>Met losse buckle</small></span><i>✓</i></button>
+          <button class="choice-card" data-variant="buckleSafety"><span><b>Buckle + Safety</b><br><small>Combinatie</small></span><i>✓</i></button>
         </div>
-
-        <label class="range-label"><span>Aantal logo's</span><b id="frontCountValue">7</b></label>
-        <input id="frontCount" class="full-range" type="range" min="1" max="14" value="7">
-
-        <label class="range-label"><span>Positie</span><b id="frontOffsetValue">0%</b></label>
-        <input id="frontOffset" class="full-range" type="range" min="-45" max="45" value="0">
-
-        <label class="range-label"><span>Rotatie</span><b id="frontRotationValue">0°</b></label>
-        <input id="frontRotation" class="full-range" type="range" min="-25" max="25" value="0">
-      </section>
-
-      <section class="side-card">
-        <div class="side-title">
-          <span>Teruglopend lint</span>
-          <small>Rechts / achterliggend</small>
-        </div>
-
-        <label class="range-label"><span>Aantal logo's</span><b id="backCountValue">7</b></label>
-        <input id="backCount" class="full-range" type="range" min="1" max="14" value="7">
-
-        <label class="range-label"><span>Positie</span><b id="backOffsetValue">0%</b></label>
-        <input id="backOffset" class="full-range" type="range" min="-45" max="45" value="0">
-
-        <label class="range-label"><span>Rotatie</span><b id="backRotationValue">0°</b></label>
-        <input id="backRotation" class="full-range" type="range" min="-25" max="25" value="0">
-      </section>
-    </div>
-
-    <div id="continuousControls" class="continuous-controls hidden">
-      <label class="range-label"><span>Schaal doorlopend ontwerp</span><b id="continuousScaleValue">100%</b></label>
-      <input id="continuousScale" class="full-range" type="range" min="40" max="220" value="100">
-
-      <label class="range-label"><span>Ontwerp verschuiven</span><b id="continuousOffsetValue">0%</b></label>
-      <input id="continuousOffset" class="full-range" type="range" min="-100" max="100" value="0">
-
-      <label class="checkrow">
-        <input id="flipBackContinuous" type="checkbox" checked>
-        <span><b>Teruglopend lint omkeren</b><small>Zorgt dat de illustratie op de achterzijde natuurlijk doorloopt.</small></span>
-      </label>
-    </div>
-
-    <div class="editorbox">
-      <div><b>Templatepad</b><small>Alleen nodig om een lintlijn te corrigeren.</small></div>
-      <button id="editPath" type="button">Pad bewerken</button>
-    </div>
-
-    <div id="editorControls" class="editor-controls hidden">
-      <label class="title">Lintdeel</label>
-      <select id="pathSelect"></select>
-      <div class="editor-actions">
-        <button id="undoPoint" type="button">Laatste punt weg</button>
-        <button id="clearPath" type="button">Pad leegmaken</button>
       </div>
-      <button id="savePath" class="save-path" type="button">Pad gereed</button>
-      <p>Klik in de preview om punten toe te voegen. Sleep een bestaand punt om het te verplaatsen.</p>
-    </div>
+      <div class="field"><label>BREEDTE</label>
+        <div class="choice-grid" id="widthGrid">
+          <button class="choice-card width-card" data-width="10">10 mm<i>✓</i></button>
+          <button class="choice-card width-card" data-width="15">15 mm<i>✓</i></button>
+          <button class="choice-card width-card selected" data-width="20">20 mm<i>✓</i></button>
+          <button class="choice-card width-card" data-width="25">25 mm<i>✓</i></button>
+        </div>
+        <div class="info" id="widthNote" style="margin-top:10px">Normaal is beschikbaar op 10, 15, 20 en 25 mm. Safety/Buckle-combinaties zijn in deze eerste versie met de echte 20 mm mockups gekoppeld.</div>
+      </div>
+      <div class="field"><label>LINTKLEUR</label><div class="input-row"><input type="color" id="color" value="#e1322d"><input type="text" id="hex" value="#E1322D"></div></div>
+      <div class="nav"><span></span><button class="btn primary next" data-to="2">Volgende: haak</button></div>
+    </section>
 
-    <div class="actions">
-      <button id="reset" class="secondary">Reset</button>
-      <button id="download" class="primary">PNG downloaden</button>
-    </div>
-  </aside>
+    <section class="section" data-section="2">
+      <h2>Kies je haak</h2><p class="lead">Geen technische dropdowns: kies gewoon het model dat je wilt zien.</p>
+      <div class="choice-grid"><button class="choice-card hook-card" data-hook="Duimhaak">
+          <span class="thumb"><img src="assets/hooks/Duimhaak.png" alt="Duimhaak"></span>
+          <span>Duimhaak</span><i>✓</i>
+        </button>
+<button class="choice-card hook-card" data-hook="Cliphaak luxe">
+          <span class="thumb"><img src="assets/hooks/Cliphaak-Luxe.png" alt="Cliphaak luxe"></span>
+          <span>Cliphaak luxe</span><i>✓</i>
+        </button>
+<button class="choice-card hook-card" data-hook="Ovaalhaak">
+          <span class="thumb"><img src="assets/hooks/Ovaalhaak.png" alt="Ovaalhaak"></span>
+          <span>Ovaalhaak</span><i>✓</i>
+        </button>
+<button class="choice-card hook-card" data-hook="Karabijnhaak">
+          <span class="thumb"><img src="assets/hooks/Karabijnhaak.png" alt="Karabijnhaak"></span>
+          <span>Karabijnhaak</span><i>✓</i>
+        </button>
+<button class="choice-card hook-card" data-hook="J-haak">
+          <span class="thumb"><img src="assets/hooks/J-Haak.png" alt="J-haak"></span>
+          <span>J-haak</span><i>✓</i>
+        </button>
+<button class="choice-card hook-card" data-hook="Sleutelring">
+          <span class="thumb"><img src="assets/hooks/Sleutelring.png" alt="Sleutelring"></span>
+          <span>Sleutelring</span><i>✓</i>
+        </button>
+<button class="choice-card hook-card" data-hook="Krokodilclip">
+          <span class="thumb"><img src="assets/hooks/Krokodilclip.png" alt="Krokodilclip"></span>
+          <span>Krokodilclip</span><i>✓</i>
+        </button>
+<button class="choice-card hook-card" data-hook="Schuifhaak">
+          <span class="thumb"><img src="assets/hooks/Schuifhaak.png" alt="Schuifhaak"></span>
+          <span>Schuifhaak</span><i>✓</i>
+        </button>
+<button class="choice-card hook-card" data-hook="Katrol / Badgereel">
+          <span class="thumb"><img src="assets/hooks/Katrol-Badgereel.png" alt="Katrol / Badgereel"></span>
+          <span>Katrol / Badgereel</span><i>✓</i>
+        </button>
+<button class="choice-card hook-card" data-hook="Telefoonlus + Duimhaak">
+          <span class="thumb"><img src="assets/hooks/Telefoonlus+Duimhaak.png" alt="Telefoonlus + Duimhaak"></span>
+          <span>Telefoonlus + Duimhaak</span><i>✓</i>
+        </button></div>
+      <div class="field"><label>ACCESSOIRES</label>
+        <div class="access-grid">
+          <button class="choice-card access-card" data-access="Safety"><span class="thumb"><img src="assets/hooks/Safety.png"></span><span>Safety</span><i>✓</i></button>
+          <button class="choice-card access-card" data-access="Buckle"><span class="thumb"><img src="assets/hooks/Buckle.png"></span><span>Buckle</span><i>✓</i></button>
+        </div>
+      </div>
+      <div class="nav"><button class="btn light next" data-to="1">Terug</button><button class="btn primary next" data-to="3">Volgende: ontwerp</button></div>
+    </section>
 
-  <section class="preview">
-    <div class="previewhead">
-      <div><small>LIVE RESULTAAT</small><h2 id="previewTitle">Template laden…</h2></div>
-      <span id="modeBadge">FRONT + BACK</span>
-    </div>
-    <div id="stage" class="stage">
-      <canvas id="canvas"></canvas>
-      <div id="empty"><b>Upload een logo</b><small>Kleur en haak zijn direct zichtbaar.</small></div>
-      <div id="loading">Mockup laden…</div>
-      <div id="editorHint" class="editor-hint hidden">Klik over het midden van het lint · sleep om te corrigeren</div>
-    </div>
-    <div class="note"><b>Opslaan op alle apparaten:</b> bewerk het pad, klik op <b>Pad gereed</b> en download daarna een nieuw <code>templates.json</code>. Vervang alleen dat bestand in GitHub.</div>
-    <div id="saveTools" class="save-tools hidden">
-      <button id="downloadTemplate" class="download-template" type="button">Templatebestand downloaden</button>
-      <button id="copyPath" class="copy-path" type="button">Alleen padgegevens kopiëren</button>
-      <small>Upload daarna het gedownloade <code>templates.json</code> in GitHub en vervang het bestaande bestand.</small>
-    </div>
-  </section>
+    <section class="section" data-section="3">
+      <h2>Maak je ontwerp</h2><p class="lead">Upload je logo en stel de herhaling in. Dit is de klantvriendelijke laag boven onze technische SVG-logica.</p>
+      <div class="upload"><b>Logo uploaden</b><br><small>PNG of SVG. SVG-groepen koppelen we later volledig aan de geavanceerde editor.</small><input type="file" id="logoInput" accept="image/*,.svg"></div>
+      <div class="field"><label>AANTAL LOGO'S</label><div class="range-row"><input id="count" type="range" min="1" max="18" value="7"><input id="countNum" type="number" min="1" max="18" value="7"></div></div>
+      <div class="field"><label>SPACING TUSSEN LOGO'S</label><div class="range-row"><input id="spacing" type="range" min="-30" max="80" value="18"><input id="spacingNum" type="number" min="-30" max="80" value="18"></div></div>
+      <div class="field"><label>LOGOGROOTTE</label><div class="range-row"><input id="logoSize" type="range" min="30" max="130" value="70"><input id="logoSizeNum" type="number" min="30" max="130" value="70"></div></div>
+      <div class="field"><label>ROTATIE</label><div class="range-row"><input id="rotation" type="range" min="-180" max="180" value="0"><input id="rotationNum" type="number" min="-180" max="180" value="0"></div></div>
+      <div class="tech-editor"><div class="mini-title">Geavanceerd ontwerp</div><div class="info">De SVG-groepering, beeldmerk/woordmerk en echte productielijn blijven voorlopig in <b>/designer-test/</b>. In een volgende stap integreren we die hier zonder de klant met technische termen lastig te vallen.</div></div>
+      <div class="nav"><button class="btn light next" data-to="2">Terug</button><button class="btn primary next" data-to="4">Controleer ontwerp</button></div>
+    </section>
+
+    <section class="section" data-section="4">
+      <h2>Controle</h2><p class="lead">Samenvatting van de keuzes die straks met een offerte-aanvraag meegaan.</p>
+      <div class="summary">
+        <div class="sumrow"><span>Model</span><b id="sumVariant">Normaal</b></div>
+        <div class="sumrow"><span>Breedte</span><b id="sumWidth">20 mm</b></div>
+        <div class="sumrow"><span>Haak</span><b id="sumHook">Duimhaak</b></div>
+        <div class="sumrow"><span>Kleur</span><b id="sumColor">#E1322D</b></div>
+        <div class="sumrow"><span>Aantal logo's</span><b id="sumCount">7</b></div>
+        <div class="sumrow"><span>Spacing</span><b id="sumSpacing">18</b></div>
+      </div>
+      <div class="info" style="margin-top:14px"><b>Demo:</b> de knop verstuurt nog niets. Voor Guus houden we straks een nette payload klaar met impressie, logo, kleur, breedte, haak, accessoires en ontwerpinstellingen.</div>
+      <div class="nav"><button class="btn light next" data-to="3">Terug</button><button class="btn primary" id="finishDemo">Offerte aanvragen (demo)</button></div>
+    </section>
+  </div>
+</aside>
 </main>
-<script src="app.js"></script>
-</body>
-</html>
+<script>
+const state={variant:'normal',width:20,hook:'Duimhaak',color:'#E1322D',logo:null,count:7,spacing:18,logoSize:70,rotation:0,access:[]};
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function normalizeHex(v){v=(v||'').trim();if(!v.startsWith('#'))v='#'+v;if(/^#[0-9a-fA-F]{3}$/.test(v))v='#'+v.slice(1).split('').map(c=>c+c).join('');return /^#[0-9a-fA-F]{6}$/.test(v)?v.toUpperCase():null}
+function gotoStep(n){$$('.step').forEach(x=>x.classList.toggle('active',x.dataset.step==n));$$('.section').forEach(x=>x.classList.toggle('active',x.dataset.section==n));document.querySelector('.content').scrollTop=0;updateSummary()}
+$$('.step,.next').forEach(b=>b.onclick=()=>gotoStep(b.dataset.step||b.dataset.to));
+function mockFile(){
+ if(state.variant==='normal') return `assets/mockups/${state.width}mm-Keycord-DEF.png`;
+ if(state.variant==='safety') return 'assets/mockups/Keycord-Safety-DEF.png';
+ if(state.variant==='buckle') return 'assets/mockups/Keycord-Buckle-DEF.png';
+ return 'assets/mockups/Keycord-Buckle-Safety-DEF.png';
+}
+function updateMock(){
+ $('#mockImg').src=mockFile(); $('#previewVariant').textContent=`${labelVariant(state.variant)} · ${state.width} mm`;
+ $('#captionHook').textContent=state.hook; $('#captionColor').textContent=state.color;
+ if(state.logo){$('#logoOverlay').src=state.logo;$('#logoOverlay').style.display='block';$('#logoOverlay').style.width=state.logoSize+'px';$('#logoOverlay').style.transform=`translate(-50%,-50%) rotate(${state.rotation}deg)`}
+ renderStrip(); updateSummary();
+}
+function labelVariant(v){return {normal:'Normaal',safety:'Safety',buckle:'Buckle',buckleSafety:'Buckle + Safety'}[v]}
+function renderStrip(){
+ const s=$('#strip'); s.style.background=state.color; s.style.gap=(Math.max(0,state.spacing)+10)+'px';s.innerHTML='';
+ for(let i=0;i<state.count;i++){let img=document.createElement('img');img.className='repeat';if(state.logo)img.src=state.logo;else img.src='assets/branding/xxlgifts-logo.png';img.style.height=Math.max(18,state.logoSize*.42)+'px';img.style.transform=`rotate(${state.rotation}deg)`;s.appendChild(img)}
+}
+function updateSummary(){
+ $('#sumVariant').textContent=labelVariant(state.variant);$('#sumWidth').textContent=state.width+' mm';$('#sumHook').textContent=state.hook;$('#sumColor').textContent=state.color;$('#sumCount').textContent=state.count;$('#sumSpacing').textContent=state.spacing;
+}
+$$('#variantGrid .choice-card').forEach(b=>b.onclick=()=>{$$('#variantGrid .choice-card').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');state.variant=b.dataset.variant;if(state.variant!=='normal'){state.width=20;$$('#widthGrid .choice-card').forEach(x=>x.classList.toggle('selected',x.dataset.width==='20'))}updateMock()});
+$$('#widthGrid .choice-card').forEach(b=>b.onclick=()=>{if(state.variant!=='normal' && b.dataset.width!=='20'){alert('Deze mockupvariant hebben we nu alleen echt op 20 mm. Normaal kan al op alle breedtes.');return}$$('#widthGrid .choice-card').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');state.width=+b.dataset.width;updateMock()});
+$$('.hook-card').forEach(b=>b.onclick=()=>{$$('.hook-card').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');state.hook=b.dataset.hook;updateMock()});
+$$('.access-card').forEach(b=>b.onclick=()=>{b.classList.toggle('selected');const a=b.dataset.access;if(b.classList.contains('selected')){if(!state.access.includes(a))state.access.push(a)}else state.access=state.access.filter(x=>x!==a)});
+$('#color').oninput=e=>{state.color=e.target.value.toUpperCase();$('#hex').value=state.color;updateMock()};
+$('#hex').oninput=e=>{const h=normalizeHex(e.target.value);if(h){state.color=h;$('#color').value=h;updateMock()}};
+function bindPair(range,num,key){range.oninput=e=>{state[key]=+e.target.value;num.value=e.target.value;updateMock()};num.oninput=e=>{state[key]=+e.target.value;range.value=e.target.value;updateMock()}}
+bindPair($('#count'),$('#countNum'),'count');bindPair($('#spacing'),$('#spacingNum'),'spacing');bindPair($('#logoSize'),$('#logoSizeNum'),'logoSize');bindPair($('#rotation'),$('#rotationNum'),'rotation');
+$('#logoInput').onchange=e=>{const f=e.target.files[0];if(!f)return;state.logo=URL.createObjectURL(f);updateMock()};
+$('#requestDemo').onclick=$('#finishDemo').onclick=()=>alert('Demo: nog geen mail verstuurd. De configuratie staat wel klaar om later aan de offerte-aanvraag te koppelen.');
+$('#downloadPreview').onclick=()=>alert('Preview-export wordt in de volgende versie aan de echte render gekoppeld. Voor nu blijft dit een testknop.');
+updateMock();
+</script>
+</body></html>
