@@ -1,22 +1,11 @@
-# XXLGifts Template Engine v2
+# XXLGifts keycord mockup test
 
-Schaalbare mockup-engine waarbij alle bestanden los in de GitHub-hoofdmap mogen staan.
+Dit project bevat drie vaste routes. De asset-organisatie verandert niets aan hun functie of ontwerp:
 
-## Huidige template
-- `20mm-normal`
+- `/` — technische mockup-engine
+- `/designer-test/` — geavanceerde ontwerp- en productielijntest
+- `/keycord-editor/` — klantgerichte keycord-editor
 
-## Naamstructuur
-Voorbeeld:
-- `20mm-normal-base.png`
-- `20mm-normal-color-mask.png`
-- `20mm-normal-design-mask.png`
-- `20mm-normal-overlay.png`
-- `20mm-normal-shadow.png`
-- `20mm-normal-duimhaak.png`
+Alle gedeelde afbeeldingen staan in [`assets/`](assets/). Zie [`assets/README.md`](assets/README.md) voor de indeling, naamregels en instructies voor nieuwe 20mm-afbeeldingen.
 
-Nieuwe voorbeelden:
-- `20mm-buckle-base.png`
-- `20mm-safety-base.png`
-- `15mm-normal-base.png`
-
-De beschikbare templates en accessoires staan in `templates.json`. Nieuwe templates vereisen geen wijziging in `app.js`.
+De technische engine leest zijn bestanden uit `templates.json`. Daardoor kunnen nieuwe enginevarianten worden toegevoegd zonder de interface opnieuw te ontwerpen.

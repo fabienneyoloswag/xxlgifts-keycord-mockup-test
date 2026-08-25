@@ -12,43 +12,43 @@
         "height": 1680
       },
       "files": {
-        "base": "20mm-normal-base.png",
-        "colorMask": "20mm-normal-color-mask.png",
-        "designFront": "20mm-normal-design-front.png",
-        "designBack": "20mm-normal-design-back.png",
-        "overlay": "20mm-normal-overlay.png",
-        "shadow": "20mm-normal-shadow.png"
+        "base": "assets/engine/20mm/normal/layers/base.png",
+        "colorMask": "assets/engine/20mm/normal/layers/color-mask.png",
+        "designFront": "assets/engine/20mm/normal/layers/design-front.png",
+        "designBack": "assets/engine/20mm/normal/layers/design-back.png",
+        "overlay": "assets/engine/20mm/normal/layers/overlay.png",
+        "shadow": "assets/engine/20mm/normal/layers/shadow.png"
       },
       "hooks": [
         {
           "id": "duimhaak",
           "label": "Duimhaak",
-          "file": "20mm-normal-duimhaak.png"
+          "file": "assets/engine/20mm/normal/hooks/duimhaak.png"
         },
         {
           "id": "ovaalhaak",
           "label": "Ovaalhaak",
-          "file": "20mm-normal-ovaalhaak.png"
+          "file": "assets/engine/20mm/normal/hooks/ovaalhaak.png"
         },
         {
           "id": "karabijnhaak",
           "label": "Karabijnhaak",
-          "file": "20mm-normal-karabijnhaak.png"
+          "file": "assets/engine/20mm/normal/hooks/karabijnhaak.png"
         },
         {
           "id": "cliphaak-luxe",
           "label": "Cliphaak luxe",
-          "file": "20mm-normal-cliphaak-luxe.png"
+          "file": "assets/engine/20mm/normal/hooks/cliphaak-luxe.png"
         },
         {
           "id": "krokodil",
           "label": "Krokodil",
-          "file": "20mm-normal-krokodil.png"
+          "file": "assets/engine/20mm/normal/hooks/krokodil.png"
         },
         {
           "id": "sleutelring",
           "label": "Sleutelring",
-          "file": "20mm-normal-sleutelring.png"
+          "file": "assets/engine/20mm/normal/hooks/sleutelring.png"
         }
       ],
       "paths": [
